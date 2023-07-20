@@ -1,6 +1,8 @@
 #this is used in my bashrc profile. For this to work as expected, you have to alias it somewhere else - and the idea is it will replace the standard ping that #comes with your distro or OS
 
 #!/bin/bash
+#In order for this to work as designed, it must be plugged in as an alias through $HOME/username/.bashrc - note the form below 
+#for $HOME/username/.bashrc: alias ping='/home/username/pingtest' ... NOTE: this will replace the ping command so be careful if or when you decide to implement it. 
 
 date >> ~/tmp/ping.log
 last_argument="${!#}"
