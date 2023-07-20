@@ -2,7 +2,7 @@
 #NOTE: For this to work, you need a file which includes programs - binary or otherwise - that need to be transfered... This file will be a list. To parse the list
 
 #populate file list first - and you can create a function for this long bash one-liner: 
-# find find $HOME/dirpath -type f |  sed 's|^~/bin/||' | tr '\0' '\n' | tee /dirpath/filelist.txt
+# find $HOME/dirpath -type f |  sed 's|^~/bin/||' | tr '\0' '\n' | tee /dirpath/filelist.txt
 #As a function in .bashrc, you can always do this: 
 
 #function cutlead {
