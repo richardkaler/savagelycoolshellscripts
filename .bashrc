@@ -93,7 +93,7 @@ alias l='ls -CF'
 
 
 #custom aliases 
-alias space="/home/richard/bin/space" 
+alias space="$HOME/bin/space" 
 alias forcerm="sudo  rm -rf -I" 
 alias up="uptime -p"
 alias memory="watch free -h"
@@ -105,21 +105,21 @@ alias rsyncmv='rsync -avr --remove-source-files --ignore-existing --progress'
 alias sbash='source ~/.bashrc'
 alias symlink='ln -sr'
 alias showfunc='declare -F' #nothing more than a reminder to refresh foundational knowledge on ... functions
-alias yuzu='/home/richard/bin/yuzu-mainline-20230531-4e5c0854a.AppImage &'
+alias yuzu='$HOME/bin/yuzu-mainline-20230531-4e5c0854a.AppImage &'
 alias rsyncp='rsync -avr --ignore-existing --progress'
-alias b='pushd /home/richard/bin/ > /dev/null 2>&1'
-alias vlcmulti='/home/richard/bin/vlcmulti'
+alias b='pushd $HOME/bin/ > /dev/null 2>&1'
+alias vlcmulti='$HOME/bin/vlcmulti'
 #alias topbin='ls -lt ~/bin | head -10'
 alias topdir='ls -lt . | head -25'
 alias morecommands='printf "Try 'dusort,' lalias,  'recrm', 'vimcomment', 'vlcmulti' or 'sbash'\n"' 
 alias ttyshow='ps $(pgrep Xorg)'
-alias bin='/home/richard/bin'
+alias bin='$HOME/bin'
 alias mv='mv -v'
 alias cp='cp -v'
-alias ping='/home/richard/bin/pingtest'
+alias ping='$HOME/bin/pingtest'
 
 #function cd() {
-#    command cd /home/richard/Desktop
+#    command cd $HOME/Desktop
 #elif [[ "$*" == "De" && -d "De" ]]; then
 #    command cd "$@"
 #  fi
@@ -198,12 +198,12 @@ function cd() {
 
 function findcut {
     echo "to remove the leading ./ from a file name try the following"
-    cat /home/richard/.findcut.txt
+    cat $HOME/.findcut.txt
 }
 
 
 function sitescrapes {
-    cd /home/richard/Videos/siteScrapes
+    cd $HOME/Videos/siteScrapes
 }
 
 function cutlead {
@@ -232,7 +232,7 @@ function cutlead {
 
 
 #function topbin {
-#    ls -lt /home/richard/bin | head -10 | less
+#    ls -lt $HOME/bin | head -10 | less
 # }
 
 #progress function 
@@ -243,7 +243,7 @@ progress-watch () {
 
 
 function lb {
-ls /home/richard/bin
+ls $HOME/bin
 }
 
 
@@ -320,7 +320,7 @@ echo -e "Previous user logging in was $printlast\nSession info for $printlast: $
 #printf "Try 'dusort,' lalias,  'recrm', 'vimcomment' or 'sbash'\n" 
 printf "type 'errorhelp' to refresh on error handling; also check out 'progress-watch'\n"
 
-#echo -e "NOTE: verify hostnames for scp and ssh connections. For example, the MacBook Air hostname is catwalk at 192.168.1.200"
+#echo -e "NOTE: verify hostnames for scp and ssh connections. For example, the PCname Model hostname is host at X.X.1.200"
 read -n 1 -r -s -p  "Press any key to continue" #Or try 'morecommands' "
 clear 
 
@@ -343,14 +343,6 @@ function bintop {
     bintop="topbin"
     $bintop
 }
-
-function seedboxserver {
-    echo  gokart@solaris.usbx.me:/home/gokart/downloads/bonbon
-    #target=$(echo gokart@solaris.usbx.me:/home/gokart/downloads/bonbon)
-    #echo $target
-}
-
-
 
 
 # enable programmable completion features (you don't need to enable
@@ -389,36 +381,36 @@ checkcommand() {
 
 trap checkcommand DEBUG
 
-export PATH="$PATH:/home/richard/bin/vagrantBoxScripts"
+export PATH="$PATH:/home/username/bin/vagrantBoxScripts"
 
 
 #if lsof -i -n | grep -i "ssh" | grep -i "ESTABLISHED" >/dev/null 2>&1; then
 #  echo -e "\e[33mSSH session is active\e[0m: VERIFY HOST NAME"
 #fi
 
-#echo -e "NOTE: verify hostnames for \e[36mscp and ssh\e[0m connections. For example, the MacBook Air hostname is catwalk at 192.168.1.200"
+#echo -e "NOTE: verify hostnames for \e[36mscp and ssh\e[0m connections. For example, the PCname Model hostname is host at X.X.1.200"
 
-#echo -e "NOTE: verify hostnames for \e[36mscp\e[0m and \e[36mssh\e[0m connections. For example, the MacBook Air hostname is catwalk at 192.168.1.200"
+#echo -e "NOTE: verify hostnames for \e[36mscp\e[0m and \e[36mssh\e[0m connections. For example, the PCname Model hostname is host at X.X.1.200"
 
-#echo -e "REMEMBER: verify hostnames for ssh protocol connections. MacBook Air: catwalk at 192.168.1.200" #Plaintext without modified color for key phrases 
+#echo -e "REMEMBER: verify hostnames for ssh protocol connections. PCname Model: host at X.X.1.200" #Plaintext without modified color for key phrases 
 
-#echo -e "\e[33mREMEMBER\e[0m: verify hostnames for ssh protocol connections. MacBook Air: catwalk at 192.168.1.200"
-echo  "Try < morecommands >" #"Info for MacBook Air: catwalk at 192.168.1.200"
+#echo -e "\e[33mREMEMBER\e[0m: verify hostnames for ssh protocol connections. PCname Model: host at X.X.1.200"
+echo  "Try < morecommands >" #"Info for PCname Model: host at X.X.1.200"
 if lsof -i -n | grep -i "ssh" | grep -i "ESTABLISHED" >/dev/null 2>&1; then
   echo -e "\e[33mSSH session is active\e[0m: VERIFY HOST NAME"
 fi
-echo "Info for MacBook Air: catwalk at 192.168.1.200"
+echo "Info for hostname: name at 192.X.X.X"
 
 
 
 
 
 
-PATH="/home/richard/perl5/bin${PATH:+:${PATH}}"; export PATH;
-PERL5LIB="/home/richard/perl5/lib/perl5${PERL5LIB:+:${PERL5LIB}}"; export PERL5LIB;
-PERL_LOCAL_LIB_ROOT="/home/richard/perl5${PERL_LOCAL_LIB_ROOT:+:${PERL_LOCAL_LIB_ROOT}}"; export PERL_LOCAL_LIB_ROOT;
-PERL_MB_OPT="--install_base \"/home/richard/perl5\""; export PERL_MB_OPT;
-PERL_MM_OPT="INSTALL_BASE=/home/richard/perl5"; export PERL_MM_OPT;
-export PATH="$PATH:/home/richard/Vagrant"
-export PATH="$PATH:/home/richard/bin"
-export PATH="$PATH:/home/richard/pythonscripts"
+PATH="$HOME/perl5/bin${PATH:+:${PATH}}"; export PATH;
+PERL5LIB="$HOME/perl5/lib/perl5${PERL5LIB:+:${PERL5LIB}}"; export PERL5LIB;
+PERL_LOCAL_LIB_ROOT="$HOME/perl5${PERL_LOCAL_LIB_ROOT:+:${PERL_LOCAL_LIB_ROOT}}"; export PERL_LOCAL_LIB_ROOT;
+PERL_MB_OPT="--install_base \"$HOME/perl5\""; export PERL_MB_OPT;
+PERL_MM_OPT="INSTALL_BASE=$HOME/perl5"; export PERL_MM_OPT;
+export PATH="$PATH:$HOME/Vagrant"
+export PATH="$PATH:$HOME/bin"
+export PATH="$PATH:$HOME/pythonscripts"
