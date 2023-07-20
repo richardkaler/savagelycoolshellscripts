@@ -19,38 +19,48 @@
 #the files must be parsed onto a list without a trailing < ./ > - or else running the script #against files on a list in any other form will result in imminent #failure 
 #As of now, this is limited ... It should work with pretty much any object a sys admin or end user is trying to fetch but I mostly use it for smaller files 
 #This has not been tested thoroughly but it is stable or has shown itself to be and I find it mighty handy - if I don't say so myself. Hopefully you enjoy it #whomever you are
-
-#!/bin/bash
-
 if [[ $@ = "-h" ]]; then
-    #echo "-------------------Help Menu-------------------"
-    #echo "options:"
-    echo "Options: scp-transfer.sh filelist.txt localdir"
+    echo "Options: scp-transfer filelist.txt localdir"
 elif [[ $# -lt 2 ]]; then 
     echo "Two arguments are required for this script:"
-    echo "Options: scp-transfer.sh filelist.txt localdir"
+    echo "Options: scp-transfer filelist.txt localdir"
 else
+    keyfile="/home/user/.ssh/id_rsa"
+    filelist="$1"
+    targetdir="$2" # local directory - where files go 
+    hostarget="gokart@solaris.usbx.me:/home/gokart/downloads/bonbon/"
 
-keyfile="$HOME/username/.ssh/id_rsa" #scp keyfile ... if this is not included, the script will require a password and that will effectively eliminate whatever utility it otherwise had
-filelist="$1"
-#filedir="$2"
-hostarget="domain:/dirpath/"
-targetdir="$2" #local directory - where files go 
+    # Read the filelist into an array
+    readarray -t files_to_transfer < "$filelist"
 
-while IFS= read -r filename; do
-  # Wrap the filename in double quotes
-  quoted_filename="$(printf "%q" "$filename")"
+    # Iterate through the files in the target directory
+    for file in "${targetdir}"/*; do
+        # Get the filename without the path
+        filename="$(basename "$file")"
 
-  if scp -i "$keyfile" -r "$hostarget$quoted_filename" $targetdir; then
-    echo "Successfully transferred file: $filename" | tee -a ~/tmp/scp-transfer.log
-elif ! scp -i "$keyfile" -r $hostarget"$quoted_filename" "$targetdir"; then
-    echo "Failed to transfer file: $filename" | tee -a ~/tmp/scp-transfer.log
-else 
-    echo "Error: exiting script" | tee -a ~/dirpath/logfile.log
-    exit 1  
-  fi
+        # Set a flag to keep track of whether the file should be downloaded
+        download_flag=false
 
-done < "$filelist"
+        # Check if the file matches any item in the filelist
+        for item in "${files_to_transfer[@]}"; do
+            if [[ "$item" == "$filename" ]]; then
+                download_flag=true
+                break
+            fi
+        done
+
+        if "$download_flag"; then
+            # Wrap the filename in double quotes
+            quoted_filename="$(printf "%q" "$filename")"
+
+            if scp -i "$keyfile" -r "$hostarget$quoted_filename" "$targetdir"; then
+                echo "Successfully transferred file: $filename" | tee -a ~/tmp/scp-transfer-scp.log
+            else
+                echo "Failed to transfer file: $filename" | tee -a ~/tmp/scp-transfer-scp.log
+            fi
+        else
+            echo "File not in the list. Skipping: $filename" | tee -a ~/tmp/scp-transfer-scp.log
+        fi
+    done
 
 fi
-
