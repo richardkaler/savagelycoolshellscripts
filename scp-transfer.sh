@@ -25,16 +25,16 @@
 if [[ $@ = "-h" ]]; then
     #echo "-------------------Help Menu-------------------"
     #echo "options:"
-    echo "Options: scp-transfer-seedbox.sh filelist.txt localdir"
+    echo "Options: scp-transfer.sh filelist.txt localdir"
 elif [[ $# -lt 2 ]]; then 
     echo "Two arguments are required for this script:"
-    echo "Options: scp-transfer-seedbox.sh filelist.txt localdir"
+    echo "Options: scp-transfer.sh filelist.txt localdir"
 else
 
 keyfile="$HOME/username/.ssh/id_rsa" #scp keyfile ... if this is not included, the script will require a password and that will effectively eliminate whatever utility it otherwise had
 filelist="$1"
 #filedir="$2"
-hostarget="gokart@solaris.usbx.me:/home/gokart/downloads/bonbon/"
+hostarget="domain:/dirpath/"
 targetdir="$2" #local directory - where files go 
 
 while IFS= read -r filename; do
@@ -42,11 +42,11 @@ while IFS= read -r filename; do
   quoted_filename="$(printf "%q" "$filename")"
 
   if scp -i "$keyfile" -r "$hostarget$quoted_filename" $targetdir; then
-    echo "Successfully transferred file: $filename" | tee -a ~/tmp/scp-transfer-seedbox.log
+    echo "Successfully transferred file: $filename" | tee -a ~/tmp/scp-transfer.log
 elif ! scp -i "$keyfile" -r $hostarget"$quoted_filename" "$targetdir"; then
-    echo "Failed to transfer file: $filename" | tee -a ~/tmp/scp-transfer-seedbox.log
+    echo "Failed to transfer file: $filename" | tee -a ~/tmp/scp-transfer.log
 else 
-    echo "Error: exiting script" | tee -a ~/tmp/scp-transfer-seedbox.log
+    echo "Error: exiting script" | tee -a ~/dirpath/logfile.log
     exit 1  
   fi
 
