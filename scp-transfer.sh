@@ -28,7 +28,7 @@ else
     keyfile="/home/user/.ssh/id_rsa"
     filelist="$1"
     targetdir="$2" # local directory - where files go 
-    hostarget="gokart@solaris.usbx.me:/home/gokart/downloads/bonbon/"
+    hostarget="username@domain:/dirpath"
 
     # Read the filelist into an array
     readarray -t files_to_transfer < "$filelist"
