@@ -206,10 +206,9 @@ function sitescrapes {
     cd /home/richard/Videos/siteScrapes
 }
 
-function cutlead { 
-   sed 's|^./||'
-} 
-
+function cutlead {
+    sed 's|^~/bin/||' | tr '\0' '\n'
+}
 
 #function ping {
 #date >> ~/tmp/ping.log
