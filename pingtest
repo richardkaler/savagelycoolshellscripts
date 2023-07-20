@@ -1,0 +1,21 @@
+#this is used in my bashrc profile. For this to work as expected, you have to alias it somewhere else - and the idea is it will replace the standard ping that #comes with your distro or OS
+
+#!/bin/bash
+
+date >> ~/tmp/ping.log
+last_argument="${!#}"
+if [[ $# = 0 ]];then
+    echo "An IP address or host name is required for this command" | tee -a ~/tmp/ping.log
+    echo "================================================" | tee -a ~/tmp/ping.log
+elif [[ $# -eq 1 ]] && /usr/bin/ping -c 5 $1; then
+    echo "Successfully reached host at $last_argument" | tee -a ~/tmp/ping.log
+    echo "================================================" | tee -a ~/tmp/ping.log
+elif [[ $# -gt 1 ]] && /usr/bin/ping "$@"; then
+    echo "Successfully reached host at $last_argument" | tee -a ~/tmp/ping.log
+    echo "================================================" | tee -a ~/tmp/ping.log
+else
+    date >> ~/tmp/ping.log
+    echo -e "\033[1Afailed to reach host at "$last_argument"" | tee -a ~/tmp/ping.log
+    echo "================================================" | tee -a ~/tmp/ping.log
+    exit 0
+fi
