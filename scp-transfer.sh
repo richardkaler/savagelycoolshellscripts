@@ -6,7 +6,7 @@
 #As a function in .bashrc, you can always do this: 
 
 #function cutlead {
-#    sed 's|^~/bin/||' | tr '\0' '\n'
+#   sed 's|^./||' | tr '\0' '\n'  
 #}
 
 
