@@ -1,5 +1,7 @@
 #!/bin/bash
 #NOTE: For this to work, you need a file which includes programs - binary or otherwise - that need to be transfered... This file will be a list. To parse the list
+#This script was intended to be highly customizable. If you have a unique files structure in your target host, you will have to address that issue accordingly when 
+#implementing this script. 
 
 #populate file list first - and you can create a function for this long bash one-liner: 
 # find $HOME/dirpath -type f |  sed 's|^~/bin/||' | tr '\0' '\n' | tee /dirpath/filelist.txt
@@ -8,8 +10,6 @@
 #function cutlead {
 #   sed 's|^./||' | tr '\0' '\n'  
 #}
-
-
 
 #Accurately, you also need to run another command ... and I will include more code for that if needed. 
 #You could do something as simple as ls dirpath | sed 's|^~/bin/||' ... At least on a Linux system, leading characters of ./ are not good friends of our dear SCP 
