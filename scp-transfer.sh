@@ -19,48 +19,44 @@
 #the files must be parsed onto a list without a trailing < ./ > - or else running the script #against files on a list in any other form will result in imminent #failure 
 #As of now, this is limited ... It should work with pretty much any object a sys admin or end user is trying to fetch but I mostly use it for smaller files 
 #This has not been tested thoroughly but it is stable or has shown itself to be and I find it mighty handy - if I don't say so myself. Hopefully you enjoy it #whomever you are
-if [[ $@ = "-h" ]]; then
+
+if [[ $1 = "-h" ]]; then
     echo "Options: scp-transfer filelist.txt localdir"
 elif [[ $# -lt 2 ]]; then 
     echo "Two arguments are required for this script:"
     echo "Options: scp-transfer filelist.txt localdir"
 else
-    keyfile="/home/user/.ssh/id_rsa"
+    keyfile="/home/username/.ssh/id_rsa"
     filelist="$1"
     targetdir="$2" # local directory - where files go 
-    hostarget="username@domain:/dirpath"
+    hostarget="domain:dirpath/"
 
     # Read the filelist into an array
     readarray -t files_to_transfer < "$filelist"
 
+    # Array to store filenames already processed
+    processed_files=()
+
     # Iterate through the files in the target directory
-    for file in "${targetdir}"/*; do
-        # Get the filename without the path
-        filename="$(basename "$file")"
+    for filename in "${files_to_transfer[@]}"; do
+        # Check if the file has been processed before
+        if [[ " ${processed_files[*]} " == *" $filename "* ]]; then
+            echo "File already processed. Skipping: $filename" | tee -a ~/tmp/scp-transfer.log
+            continue
+        else
+            # Add the filename to the processed_files array
+            processed_files+=(" $filename ")
 
-        # Set a flag to keep track of whether the file should be downloaded
-        download_flag=false
-
-        # Check if the file matches any item in the filelist
-        for item in "${files_to_transfer[@]}"; do
-            if [[ "$item" == "$filename" ]]; then
-                download_flag=true
-                break
-            fi
-        done
-
-        if "$download_flag"; then
             # Wrap the filename in double quotes
             quoted_filename="$(printf "%q" "$filename")"
 
             if scp -i "$keyfile" -r "$hostarget$quoted_filename" "$targetdir"; then
-                echo "Successfully transferred file: $filename" | tee -a ~/tmp/scp-transfer-scp.log
+                echo "Successfully transferred file: $filename" | tee -a ~/tmp/scp-transfer.log
             else
-                echo "Failed to transfer file: $filename" | tee -a ~/tmp/scp-transfer-scp.log
+                echo "Failed to transfer file: $filename" | tee -a ~/tmp/scp-transfer.log
             fi
-        else
-            echo "File not in the list. Skipping: $filename" | tee -a ~/tmp/scp-transfer-scp.log
         fi
     done
 
 fi
+
