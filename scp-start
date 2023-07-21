@@ -1,0 +1,26 @@
+#This is a basic scp wrapper script.
+#NOTE: this is a one-way wrapper. I may create something more robust that can be used to both send and receive scp files but doing so requires
+#something much more verbose along with a help menu and getopts format which is immeasurably more complex 
+
+#!/bin/bash 
+
+cmd="scp -r -i /home/username/.ssh/id_rsa"
+
+
+if [[ $1 == "-h" ]]; then  #[[ $2 -lt 2 ]]; then 
+    echo "=================>Help Menu<===================="
+    echo "scp-start -h (this menu)"
+    echo "At least two arguments are required"  
+    echo "Ex: scp-start  < ~/Desktop/dirpath > < username@remotehost:/home/Desktop/dirpath >"
+    echo "================================================"
+elif ! [[ -f $1 ]] && ! [[ -d $1 ]] || [[ $# -lt 2 ]]; then 
+    echo "Invalid Syntax. See Options:"
+    echo "scp-start -h (help menu)"
+    echo "Ex: scp-start  < ~/Desktop/dirpath > < username@remotehost:/home/Desktop/dirpath >" 
+    exit 0
+elif $cmd "$@"; then 
+    echo "Success! ---------------------> Copied $1 to $2"
+else 
+    echo "Error: transfer failed - review syntax and logs"
+    exit 0
+fi 
