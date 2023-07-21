@@ -1,6 +1,5 @@
-#This is a basic scp wrapper script.
-#NOTE: this is a one-way wrapper. I may create something more robust that can be used to both send and receive scp files but doing so requires
-#something much more verbose along with a help menu and getopts format which is immeasurably more complex 
+#NOTE: this is a basic scp one-way wrapper. I may create something more robust that can be used to both send and receive scp files but this is good for its simplicity
+#something with higher verbosity along with a help menu and getopts format may arrive in the not-so-distant future 
 
 #!/bin/bash 
 
