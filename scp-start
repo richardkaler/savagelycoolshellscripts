@@ -7,7 +7,7 @@
 cmd="scp -r -i /home/username/.ssh/id_rsa"
 
 
-if [[ $1 == "-h" ]]; then  #[[ $2 -lt 2 ]]; then 
+if [[ $1 == "-h" ]]; then 
     echo "=================>Help Menu<===================="
     echo "scp-start -h (this menu)"
     echo "At least two arguments are required"  
