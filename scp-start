@@ -22,5 +22,5 @@ elif $cmd "$@"; then
     echo "Success! ---------------------> Copied $1 to $2"
 else 
     echo "Error: transfer failed - review syntax and logs"
-    exit 0
+    exit 1
 fi 
