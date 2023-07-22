@@ -1,5 +1,6 @@
 #!/bin/bash 
 
+#This wrapper is for receiving files 
 #*Compliment to to scp-start - there is very little difference between this script and scp-start, aside fom this one being tailored for receiving files.
 #I will combine the two scripts into one wrapper but for now, these are handy - especially for a system admininstrator who performs one-sided tasks i.e., inbound
 #or outbound transfers. 
