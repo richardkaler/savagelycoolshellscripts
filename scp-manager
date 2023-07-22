@@ -1,0 +1,87 @@
+#!/bin/bash
+
+#This is the fully robust scp wrapper that combines scp-send with scp-rec. 
+
+cmd="scp -r -i /home/username/.ssh/id_rsa"
+
+# Function to display script usage
+function usage() {
+  echo "Syntax: scp-manager [-r|-s] <source> <destination>"
+  echo "Options:"
+  echo "  -r  Ex: scp-manager -r <username@remotehost:/dir/path> <~/dir/path>"
+  echo "  -s  Ex: scp-manager -s <~/dir/path> <username@remotehost:/dir/path>"
+  echo "  -h  scp-manager -h (this menu)"
+  exit 0
+}
+
+# Function to check if a directory or file exists on the local system
+function check_local_path() {
+  if ! [[ -f "$1" ]] && ! [[ -d "$1" ]]; then
+    echo "Error: Path '$1' does not exist on the local system."
+    exit 1
+  fi
+}
+
+# Default flag values
+receive_mode=false
+send_mode=false
+
+# Parse command-line options using getopts
+while getopts "rsh" opt; do
+  case "$opt" in
+    r) receive_mode=true ;;
+    s) send_mode=true ;;
+    h) usage ;;
+    \?) usage ;;
+  esac
+done
+
+# Shift to the first non-option argument
+shift $((OPTIND - 1))
+
+# Check if only one mode is selected
+if [[ "$receive_mode" == "$send_mode" ]]; then
+  echo "Error: Please specify only one mode (-r or -s)."
+  usage
+  exit 1
+fi
+
+# Check for the required number of arguments in receive mode
+if $receive_mode && [[ $# -ne 2 ]]; then
+  echo "Error: Invalid number of arguments."
+  usage
+  exit 1
+fi
+
+# Check for the required number of arguments in send mode
+if $send_mode && [[ $# -ne 2 ]]; then
+  echo "Error: Invalid number of arguments."
+  usage
+  exit 1
+fi
+
+# Handle inbound transfer
+if $receive_mode; then
+  if $cmd "$@"; then
+    # In inbound mode, we cannot directly check if the remote file exists before the transfer
+    # Instead, we can check if the local file exists after the transfer is complete
+    check_local_path "$2"
+    echo "Success! $1 ---------------------> $2 "
+    exit 0
+  else
+    echo "Error: transfer failed - review syntax and logs"
+    exit 1
+  fi
+fi
+
+# Handle outbound transfer
+if $send_mode; then
+  check_local_path "$1"
+  if $cmd "$@"; then
+    echo "Success! $1 ---------------------> $2 "
+    exit 0
+  else
+    echo "Error: transfer failed - review syntax and logs"
+    exit 1
+  fi
+fi
