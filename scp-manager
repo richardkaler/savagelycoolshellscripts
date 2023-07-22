@@ -1,8 +1,9 @@
 #!/bin/bash
 
-#This is the fully robust scp wrapper that combines scp-send with scp-rec. 
+#This is the fully robust scp wrapper that combines scp-send with scp-rec. It will work without including the ssh key on line 5 but to fully utilize the features 
+of this script, you should add it manually. Without the ssh key file, a password will be required. 
 
-cmd="scp -r -i /home/username/.ssh/id_rsa"
+cmd="scp -r -i /home/username/.ssh/id_rsa" #Required ssh key 
 
 # Function to display script usage
 function usage() {
