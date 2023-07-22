@@ -1,3 +1,4 @@
+#This wrapper is for sending files 
 #NOTE: this is a basic scp one-way wrapper. I may create something more robust that can be used to both send and receive scp files but this is good for its simplicity
 #something with higher verbosity along with a help menu and getopts format may arrive in the not-so-distant future 
 
