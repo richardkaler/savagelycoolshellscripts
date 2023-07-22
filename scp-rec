@@ -1,0 +1,34 @@
+#!/bin/bash 
+
+#*Compliment to to scp-start - there is very little difference between this script and scp-start, aside fom this one being tailored for receiving files.
+#I will combine the two scripts into one wrapper but for now, these are handy - especially for a system admininstrator who performs one-sided tasks i.e., inbound
+#or outbound transfers. 
+
+#NOTE: this is a basic scp one-way wrapper. I may create something more robust that can be used to both send and receive scp files but this is good for its simplicity
+#something with higher verbosity along with a help menu and getopts format may arrive in the not-so-distant future
+
+cmd="scp -r -i /Users/username/.ssh/id_rsa"
+
+
+if [[ $1 == "-h" ]]; then
+    echo "=================>Help Menu<===================="
+    echo "scp-start -h (this menu)"
+    echo "At least two arguments are required"
+    echo "Ex: scp-rec  <  username@remotehost:/home/Desktop/path > < ~/Desktop >"
+    echo "================================================"
+    exit 0
+#elif ! [[ -f $1 ]] && ! [[ -d $1 ]] || [[ $# -lt 2 ]]; then
+#    echo "Invalid Syntax. See Options:"
+#    echo "scp-start -h (help menu)"
+#    echo "Ex: scp-rec  <  username@remotehost:/home/Desktop/path > < ~/Desktop >"                                        
+#    exit 1
+elif [[ $# -eq 2 ]]; then
+         while $cmd "$@"
+            do #elif  [[ $# -eq 2 ]]; then    
+            echo "Success! ---------------------> Copied $1 to $2" 
+            exit 0
+        done
+else
+    echo "Error: transfer failed - review syntax and logs"
+    exit 1
+fi
