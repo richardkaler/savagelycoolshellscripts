@@ -1,0 +1,47 @@
+#!/bin/bash
+
+#NOTE: This is a basic wrapper that uses the find command to search for patterns in directories. It simplifies the process by using flags 
+#It also reduces the number of arguments required to perform searches which can become tedious for administrators and analysts who rely on parsing using the find command 
+
+
+#Usage options which are defined using case stements below 
+usage() {
+  echo "file-dir-search: A simple wrapper that searches for files and directories" 
+  echo "Usage: searchfilesdirs [ -d | -f | -h ] <search_term> <location>"
+  echo "  <search_term>   The string pattern used to identify files."
+  echo "  <location>      The directory path to start the search from."
+  exit 0
+}
+
+if [[ $# -lt 1 ]]; then
+  echo "Error: at least one argument is required"
+  echo "Usage: searchfilesdirs [ -d | -f | -h ] <search_term> <location>"
+  exit 1
+fi
+
+case "$1" in #Processes commmand flags using case statement syntax - syntax is simiilar to that found in getopts parsing 
+  -h)
+    usage
+    ;;
+  -d)
+    if [[ ! -d "$3" ]]; then
+      echo "Invalid directory: $3"
+      exit 1
+    fi
+    find "$3" -type d -iname "*$2*" -exec ls -ld {} + #Search for directories by using the find command and directory flag; Using -d with ls prevents verbosity from recursion 
+    ;;   
+  -f)
+    search_term="$2"
+    location="$3"
+    if [[ ! -d "$location" ]]; then
+      echo "Invalid directory: $location"
+      exit 1
+    fi
+    find "$location" -type f -iname "*$search_term*" -exec ls -l {} + #Processes file strings and search for them by using the find command and file flag 
+    ;;
+  *)
+    echo "Invalid option: $1"
+    usage
+    exit 1
+    ;;
+esac
