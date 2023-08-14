@@ -12,7 +12,7 @@ cmd="scp -r -i /Users/username/.ssh/id_rsa"
 
 if [[ $1 == "-h" ]] || [[ $# -eq 0 ]]; then
     echo "=================>Help Menu<===================="
-    echo "scp-start -h (this menu)"
+    echo "scp-rec -h (this menu)"
     echo "At least two arguments are required"
     echo "Ex: scp-rec  <  username@remotehost:/home/Desktop/path > < ~/Desktop >"
     echo "================================================"
