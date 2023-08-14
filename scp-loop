@@ -1,0 +1,34 @@
+#This is probably the best SCP script I have worked on so far - at least if you are looking for a way to make your life easier as a system administrator 
+#and you don't have rsync installed. (I will have an rsync script here soon - something that runs over SSH.) 
+
+#!/bin/bash 
+
+logloc="${HOME}/tmp/scp-loop.log" #where you want to store your script log - and I create a tmp folder in my user directory for this 
+server="username@domain:/dir/" #The name of the domain you are connecting to along with the directory 
+
+#Files you want processed below. I will try to modify this so that it works with a list but for now this is pretty good as you simply need to enter the files
+#into the script below 
+
+files=( 
+"*file*"
+)
+
+#Array to process file list 
+for file in "${files[@]}"; do
+     if {
+       echo attempting to download "${file}" 
+       scp -r -i "/home/user/.ssh/id_rsa" "${server}"/"${file}" ~/downloadedmedia | tee -a "${logloc}" || true 
+     };then  
+          echo "success !"
+          echo processed "${file}" | tee -a "${logloc}"
+    else 
+          echo failed to process "${file}" | tee -a "${logloc}"
+    
+    fi
+  
+done
+
+
+
+
+
