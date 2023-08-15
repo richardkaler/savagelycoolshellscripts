@@ -1,0 +1,8 @@
+#this is pretty straightforward - just a function that surrounds file lines with quotations - nothing more and nothing less. This is handy when 
+#you need to parse several object for manipulation - and avoid word splitting 
+
+linequotes() {
+    while read line; do
+        echo -e "\"$line\""
+    done < "${1}" #The file as a first argument that is being read. You could create a script for this but I just have it in my bashrc file. 
+}
