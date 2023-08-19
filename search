@@ -2,19 +2,20 @@
 
 #NOTE: This is a basic wrapper that uses the find command to search for patterns in directories. It simplifies the process by using flags 
 #It also reduces the number of arguments required to perform searches which can become tedious for administrators and analysts who rely on parsing using the find command 
-
+#Note on revisions: this is the second version for this script - and the only difference is I cleaned up a few strings which were incorrect and misleading and I renamed
+#the script so that its purpose is self-explanatory
 
 #Usage options which are defined using case stements below 
 usage() {
-  echo "file-dir-search: A simple wrapper that searches for files and directories" 
-  echo "Usage: searchfilesdirs [ -d | -f | -h ] <search_term> <location>"
-  echo "  <search_term>   The string pattern used to identify files."
+  echo "search: A simple wrapper that searches for files and directories" 
+  echo "Usage: search [ -d | -f | -h ] <search_term> <location>"
+  echo "  <search_term>    The string pattern used to identify files."
   echo "  <location>      The directory path to start the search from."
   exit 0
 }
 
 if [[ $# -lt 1 ]]; then
-  echo "Error: at least one argument is required"
+  echo "Error: at least one argument is required:"
   echo "Usage: searchfilesdirs [ -d | -f | -h ] <search_term> <location>"
   exit 1
 fi
