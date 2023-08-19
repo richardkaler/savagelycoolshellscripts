@@ -1,0 +1,42 @@
+#This is a script I wrote as an efficient way to kill PID processes. You can do this with pkill but the problem with pkill is that it 
+#may leave some frozen processes open. Killall is a good option but killall only accepts full program names and will not grep for programs in the same way that 
+#pkill does. My script will grep for programs using pgrep then kill them with the kill -9 signal which is stronger than just using kill. You can modify this and 
+#Change it to kill instead but that won't be as effective for pesky programs which remain. There is also the option of using pkill -9 and that's a fine option as well. 
+#I opted for kill -9 with my while loop and I like the verbose output my script gives. There are various ways to solve to terminate open programs but so far this scrip
+#has worked well for me. 
+
+#!/bin/bash 
+
+proctree=$(pgrep "${1}")
+
+if  [[ "$#" -lt 1 ]]; then 
+    echo This script requires an argument 
+    echo Ex: pidkiller firefox
+    exit 1
+fi
+
+if [[ -z $proctree ]]; then 
+    echo No processes related to "${1}" exist 
+    echo Enter a program with a process running. Exiting script 
+    exit 1
+else 
+    
+    echo "$proctree" | while read -r line
+    do
+        if kill -9 "$line"; then 
+            echo killed "$line"
+        else 
+            echo failed to kill "$line"
+        fi 
+    done   
+    sleep 1s
+    if ! pgrep "${1}"; then 
+        echo successfully killed all processees related to "${1}" 
+        exit 0
+    else 
+        procremain=$(pgrep "${1}")
+        echo failed to kill some processes related to "${1}"
+        echo pid "${procremain}" related to "${1}" still active 
+        exit 1
+    fi    
+fi
