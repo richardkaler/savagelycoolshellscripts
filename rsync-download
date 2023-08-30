@@ -27,7 +27,7 @@ echo "*${filearg}*" | while read -r line
 do
     if {
        echo attempting to download "${filearg}"
-         rsync -vrP -e ssh ${server}/"${line}" ~/downloadedmedia | tee -a "${logloc}" || true
+         rsync -vrP -e ssh ${server}/"${line}" ~/downloadedmedia | tee -a "${logloc}"
      };then
           exit 0
     else
