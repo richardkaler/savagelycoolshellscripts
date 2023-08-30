@@ -1,9 +1,10 @@
+#!/bin/bash
+
 #I just finished this today - and it is great so far. This is nothing more than a re-written version of my scp wrapper for downloading files from a server using
 #rsync instead of scp. Technically, scp is deprecated do to it's vulnerabilities - and Red Hat advises not using it. Well, those guys don't know everything 
 #but even if they aren't completely wrong rsync is faster and when used with SSH it has the same encryption features offered by scp. I need to write a full wrapper
 #that works with both uploads and downloads - but that is more complicated. I promise at some point to post a version of these scripts written in Go. 
 
-#!/bin/bash
 
 if [[ -z "${1}" ]]; then
     echo "Error: missing an argument. Enter a file or directory"
