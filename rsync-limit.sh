@@ -1,0 +1,85 @@
+#!/bin/bash
+
+
+#Aug 23, 2023 
+#NOTE: This is current set up for a list and that's what filearg is for now 
+
+if [[ -z "${1}" ]]; then
+    echo "Error: missing an argument. Enter a file"
+    echo Ex: \"rsync-download file\"
+    exit 1
+elif [[ "${1}" == "-h" ]]; then
+   echo "Enter a filelist to process"
+   echo Ex: \"rsync-download file\"
+   exit 0
+fi
+
+
+
+
+
+
+
+logloc="${HOME}/tmp/rsync-download.log"
+server="username@domain:/home/user/dir"
+filearg="${1}"
+
+filecmd=$(du -hs /home/username/dir")
+trimcalc=$(echo "${filecmd}" | awk '{print $1}' | sed 's/K//g' |  sed 's/G//g') || true    
+reducedval=$(echo "${filecmd}" | awk '{print $1}' | sed 's/K//g' |  sed 's/G//g' | sed 's/M//g') || true 
+
+
+val="$trimcalc"
+#echo "$val"
+
+charval="$reducedval"
+output="${val: -1}"
+
+charmax() {
+   ${charval}  
+   n=0
+   while read -n1 character; do 
+   n=$((n+1))
+   done < <(echo -n "${charval}")
+   echo $n
+}
+echo at "44"
+#charmax 
+
+charmaxval=$(charmax "$@")
+echo "$charmaxval"
+
+
+reducedval_char="${charval: -3}"
+#echo "$output"
+echo "${reducedval_char}"
+
+while :                                                            #cat "${filearg}" | while read -r line 
+do
+
+    echo "truncated value: echo  $charval"
+    while ! [[ "${output}" == "M"  &&  $charmaxval -ne 3 ]]  || [[ $charval -lt 53 && ! $charval -gt 54 ]]                     
+    do 
+    echo good 
+    if {
+       count=0
+       while [[ ${count} -le 15 ]]
+         do 
+       echo attempting to download "${filearg}"
+       rsync -vrP -e ssh "${server}"/"*${filearg}*" /home/username/dir/ | tee -a "${logloc}" || true 
+       echo "===================================================" 
+      sleep 2s
+      ((count ++))
+   done 
+     };then
+          exit 0
+    else
+          echo failed to process "${filearg}" | tee -a "${logloc}"
+          exit 1
+    fi
+    done 
+ break 
+  
+ done
+ 
+
