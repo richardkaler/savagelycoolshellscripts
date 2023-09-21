@@ -1,0 +1,89 @@
+#!/bin/bash 
+
+read -r -p "Enter the full path of the directory for the files you want to modify: " dirloc
+read -r -p "Type 'special' to remove whitespace along with special characters: Ex: '!' or '&' '*'
+Type 'space' to replace whitespace <  > with '_' NOTE: Do not use use quotation marks: " text
+
+
+
+
+#if [[ "$text" == "space" ]]; then
+#   function sedfill {
+
+#if [[ "$dirloc" == "." ]]; then
+
+if [[ -n "$dirloc" ]] || [[ "$dirloc" == "$PWD" ]] || [[ "$dirloc" == "." ]]; then  #|| "$dirloc" == "." ]]; then
+#varsearch="$dirloc"
+#varfind=$(find "$var") || return
+#echo "$varfind"
+#exit
+#echo "$var"
+find "$dirloc" -maxdepth 1 |  while IFS= read -r line
+do
+   function filelist {
+    for file in *
+    do
+    echo processing "$file"
+    done
+ }
+ filelist "$@"
+if ! [[ "$text" == "space" ]]; then
+    find "$dirloc" -name "$line" | while IFS= read -r item
+    do
+        specialrep=$(find "$dirloc" -maxdepth 1 -exec rename 's/[^[:alnum:]]//g' {} +)   #specialrep=$(echo "$item" |  sed 's/[^[:alnum:]]//g')
+    sleep 1s && wait
+    mv "$item" "$specialrep"
+    echo exiting script
+exit 0
+done
+fi
+
+
+ if [[ "$text" == "space" ]]; then
+        function sedfill {
+            var=$(find "$dirloc" -maxdepth 1 -name "* *" -exec rename "s/ /_/g" {} +)
+echo ===========================================
+#            echo "$var" 2>&1
+   confirm=$(find "$line" -maxdepth 1 | grep -v "* *")
+                if [[ -z "$confirm" ]]; then
+                    #newfilet=$(find "$line" -name "*_*")
+                    #newobject=$(find  -type f)
+
+
+#                   echo new file name: "$newobject"
+#                else
+                    echo no change made to "$line"
+                else
+                    echo files have been modified
+                    echo ===========================================
+
+                fi
+            if [[ -z "$confirm" ]]; then
+                echo at least some files with white space remain:
+                find "$line" -maxdepth 1 | grep "* *"
+            else
+                echo finished running script - no more files to edit
+                echo Remaining files:
+                filelist "$@" | awk '{ print $2 }'
+            exit 0
+            fi
+    }
+sedfill "$@"
+else
+            function proctext {
+    var=$(find "$line" -maxdepth 1 | grep "$text" | sed s"/$text//g")
+    if [[ -n "$var" ]]; then
+        if mv "$line" "$var"; then
+            echo Success: renamed "$line" to "$var"
+        else
+            echo failed to rename "$line"
+
+        fi
+ fi
+            }
+                  proctext "$@"
+fi
+done
+else
+   echo  invalid directory location
+   fi
