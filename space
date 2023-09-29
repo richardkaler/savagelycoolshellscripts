@@ -1,0 +1,92 @@
+#!/bin/bash
+
+#NOTE: This is a rough draft of what I have been working on for some time. It works - kinda, sorta... I like where it's at now but I will make the menu more
+robust and I need to troubleshoot it more for error correct and input validation. So far so good though. 
+
+if [[ "$1" == "-h" ]]; then
+    echo "---------------------->Help menu <----------------------"
+    echo "Options: [ dir | -all ]"
+    echo "1.): space ~/Desktop: total for Desktop, along with space for the primary drive"
+    echo "2.): space -all: for a summary of space being used by all attached drives"
+    echo "NOTE: If no argument is provided, the defauls is space -all"
+    echo "---------------------->Help menu <----------------------"
+exit 0
+fi
+    function localdrive {
+df -hT /
+}
+
+
+if [[ "$1" == "." || "$1" == "$PWD" ]]; then  #&& ! [[ "$PWD" == "$HOME" ]]; then  #this is messy... Clearly, the flowchart is not here. I need to think about priorities
+    while :
+do
+
+    localdrive "$@"
+echo =================================
+total=$(du -chs "$1" | tail -1 | awk '{ print $1 }')
+#if [[ "$1" == "." ]]; then #|| "$1" == "$PWD" ]]; then
+echo "$PWD" using: "$total"
+#fi
+sleep 2m
+done
+fi
+if [[ -d "$1" ]] && [[ "$PWD" != "$1" ]]; then
+while :
+do
+vareval=$(du -chs "$1" | tail -1 | awk '{ print $1 }')
+    localdrive "$@"
+echo =================================
+total=$(du -chs "$1" | tail -1 | awk '{ print $1 }')
+echo "$1" using: "$vareval"
+sleep 2m
+done
+else
+
+
+function sleeptime {
+    if [[ -z "$1" ]] || [[ "$1" == "-all" && "$#" -lt 2 ]]; then
+        sleep 2m
+    elif ! [[ "$1" == "-all" ]] || (("$#" >= 2 )); then   #elif (( "$#" >= 2 )); then
+      sleep "${@: -1}"
+    else
+    echo invalid parameters: exiting script
+    exit 1
+    fi
+
+}
+
+while :
+do
+    echo "press ctrl+c anytime to exit script..."
+echo "To specify the refresh rate, specify an argument"
+echo "< ==================================== >"
+    df -hTt ext4
+    df -hT --type fuseblk
+echo "< ==================================== >"
+echo "isolating space used by local < /dev/mapper/vgubuntu-root > :"
+echo "< ==================================== >"
+    df -hT "/dev/mapper/vgubuntu-root" | tee -a ~/tmp/space.log
+    echo =============================================================== >> ~/tmp/space.log
+echo "---------------$(date)------------------" | tee -a ~/tmp/space.log
+    echo "isolating space used by secondary drives: "
+    echo ===============================================================
+    df -hT  /mnt/bitlocker/424gb-mypassport /media/passport-mount-win/ /media/veracrypt3
+    echo ===============================================================
+      if [[ "$#" -lt 2 ]]; then
+      echo Default: refreshing every three minutes
+    else
+    echo refreshing every "${@: -1}"
+    fi
+    sleeptime "$@"
+    ((count++))
+
+    if ((count == 5)); then
+        count=0
+        clear
+    fi
+done
+
+fi
+
+
+
