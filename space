@@ -1,9 +1,66 @@
-#!/bin/bash
+#!/bin/bash 
 
-#NOTE: This is a rough draft of what I have been working on for some time. It works - kinda, sorta... I like where it's at now but I will make the menu more
-robust and I need to troubleshoot it more for error correct and input validation. So far so good though. 
+#NOTE: I keep working on this, tirelessly. Not getting it exactly where I want it but perhabs edging it to towards finality. I think it works well as is but 
+# the help menu leaves much to be desired - and also I prefer help menu code be placed at the start of a script - yet I jammed it a couple of blocks down 
+#I believe the command flags do work, but if you try to do too much with this - if you experiment with it a bit more, it may fail. I'll keep cleaning this up 
+# over time. 
 
-if [[ "$1" == "-h" ]]; then
+#Functionality: This is intended as a way to monitor disk use on a system that is constantly fluctuating - in terms of disk space. In an environment with endless 
+#storage - several terrabytes of disk space, or in a cloud environment, my script has limited utility. However, in a home environment where a lot of data 
+#is transferred and too much will freeze up the system, this does the trick. It would be cool to have some type of alarm built into it but I haven't 
+#gotten to that point yet. 
+
+
+
+function spacelocal {
+df -hT /
+echo =================================
+total=$(du -chs "$PWD" | tail -1 | awk '{ print $1 }')
+
+echo Total for "$PWD": "$total" 
+}
+
+if [[ "$1" == "local" ]] && [[ "$#" -eq 2 ]]; then      
+
+echo press ctrl+c to exit loop     
+echo refreshing every "${@: -1}" 
+count=0
+while [[ $count -lt 1 ]] 
+do    
+    ((count++))
+done    
+  while :   
+  do 
+ count=0
+ while [[ $count -lt 4 ]] 
+  do 
+     spacelocal "$@" 
+      sleep "${@: -1}" 
+    echo refreshing now | pv -qL 14                   
+      ((count++))
+done
+    clear 
+done
+
+#Second conditional block without specified time increments using sleep 
+
+elif [[ "$1" == "local" ]] && [[ "$#" -eq 1 ]]; then 
+   
+echo press ctrl+c to exit loop     
+count=0
+while [[ $count -lt 1 ]] 
+do    
+    echo "refreshing in 30 minutes" | pv -qL 14 
+    ((count++))
+done    
+while : 
+do     
+spacelocal "$@" 
+    sleep 30m
+clear 
+done
+fi 
+if  [[ "$1" == "-h" ]]; then
     echo "---------------------->Help menu <----------------------"
     echo "Options: [ dir | -all ]"
     echo "1.): space ~/Desktop: total for Desktop, along with space for the primary drive"
@@ -12,21 +69,19 @@ if [[ "$1" == "-h" ]]; then
     echo "---------------------->Help menu <----------------------"
 exit 0
 fi
-    function localdrive {
+
+function localdrive {
 df -hT /
 }
 
 
-if [[ "$1" == "." || "$1" == "$PWD" ]]; then  #&& ! [[ "$PWD" == "$HOME" ]]; then  #this is messy... Clearly, the flowchart is not here. I need to think about priorities
+if [[ "$1" == "." || "$1" == "$PWD" ]]; then 
     while :
 do
-
     localdrive "$@"
 echo =================================
 total=$(du -chs "$1" | tail -1 | awk '{ print $1 }')
-#if [[ "$1" == "." ]]; then #|| "$1" == "$PWD" ]]; then
 echo "$PWD" using: "$total"
-#fi
 sleep 2m
 done
 fi
@@ -38,7 +93,11 @@ vareval=$(du -chs "$1" | tail -1 | awk '{ print $1 }')
 echo =================================
 total=$(du -chs "$1" | tail -1 | awk '{ print $1 }')
 echo "$1" using: "$vareval"
-sleep 2m
+if [[ "$#" -ge 2 ]]; then 
+    sleep "${@: -1}"
+else
+    sleep 2m
+fi
 done
 else
 
@@ -58,7 +117,6 @@ function sleeptime {
 while :
 do
     echo "press ctrl+c anytime to exit script..."
-echo "To specify the refresh rate, specify an argument"
 echo "< ==================================== >"
     df -hTt ext4
     df -hT --type fuseblk
@@ -67,16 +125,13 @@ echo "isolating space used by local < /dev/mapper/vgubuntu-root > :"
 echo "< ==================================== >"
     df -hT "/dev/mapper/vgubuntu-root" | tee -a ~/tmp/space.log
     echo =============================================================== >> ~/tmp/space.log
-echo "---------------$(date)------------------" | tee -a ~/tmp/space.log
-    echo "isolating space used by secondary drives: "
-    echo ===============================================================
-    df -hT  /mnt/bitlocker/424gb-mypassport /media/passport-mount-win/ /media/veracrypt3
-    echo ===============================================================
-      if [[ "$#" -lt 2 ]]; then
+      if [[ "$#" -ne 1 ]] && [[ "$1" != "-all" ]]; then
       echo Default: refreshing every three minutes
-    else
-    echo refreshing every "${@: -1}"
-    fi
+  elif  [[ "$1" != "-all" ]] && [[ "$1" != "infinity" ]]; then 
+        echo refreshing every "${@: -1}"
+    else  #[[ "$1" = "infinity" ]]; then 
+       cat /dev/null
+   fi
     sleeptime "$@"
     ((count++))
 
@@ -87,6 +142,8 @@ echo "---------------$(date)------------------" | tee -a ~/tmp/space.log
 done
 
 fi
-
+else 
+    echo "Error - review syntax or check logs"
+fi
 
 
