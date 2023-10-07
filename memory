@@ -6,6 +6,13 @@
 #put larger code blocks in bashrc - as that makes the user profile tedious to handle and it's intended use is for aliases and short code snippets
 #... Not fully developed programs. That's a personal opinion though. 
 
+  function memorybeast {
+  ps aux --sort -pmem | head -6  | awk '{ print $2, $3, $4, $5, $11 }' | column -t #this is a robust sequence of commands using pipes and awk... it's easier to 
+  } #read as a function the way I have it. 
+  
+
+
+
 function memory {
 while true  
 do 
