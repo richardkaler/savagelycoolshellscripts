@@ -1,0 +1,30 @@
+#This is a simple script to create a user account and password - and generally the system administrator will use something more robust but if 
+#all of the users are interfacing on a command line based system - or a set up with an old school environment - this could be used on every host 
+#I also wrote this as a teaching aid - given my experience as a former cybersecurity bootcamp instructor
+
+read -r -p "Let's start with your user name. Enter a name for your user account. 
+Note, this is the name you will log in with: " name 
+echo "Okay - thank you"
+
+while [[ -n "$name" ]] #You could do this with a nested if-statement - but I opted for a while loop and break at the end. I felt like that makes it 
+do #easier to read and provides for quicker code execution - but I encourage anyone to edit it if this doesn't seem fitting for any given use case. 
+    if sudo useradd -m "$name"; then 
+        echo "The user name $name has been created"
+    elif [[ -n $(cat /etc/passwd | grep "$name") ]]; then 
+        echo "user already created"
+    else
+        echo "Failed to create a username - try something else"
+        exit 1
+    fi
+
+    echo "Now let's create a password for your account. Enter a password"
+    
+    if sudo passwd "$name"; then 
+        echo "Your password has been accepted - try to log into your account"
+    else
+       echo "Failed to create password - try something else." 
+      exit 1 
+    fi 
+    break 
+done
+
