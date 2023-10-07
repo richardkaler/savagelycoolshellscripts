@@ -1,0 +1,34 @@
+#!/bin/bash 
+
+#while not ntended as a full script, this can be used as a function. I keep this in my bashrc profile. 
+#It will accept arguments but there is no help menu. I may change that. I should have this in my script folder but elected to place it in my bashrc
+#and I only did that because it seemed like a good idea at the time. While the decision is a subjective one, I recommend that a scripter not 
+#put larger code blocks in bashrc - as that makes the user profile tedious to handle and it's intended use is for aliases and short code snippets
+#... Not fully developed programs. That's a personal opinion though. 
+
+function memory {
+while true  
+do 
+    if [[ "$#" = 0 ]]; then 
+        free -hmt  
+        echo ==================================================================================
+       echo top memory hogs: 
+       memorybeast "$@"                    #cat /proc/swaps
+        sleep 5m 
+     else 
+         echo "  ----------------------------------->  $(date) <----------------------------------- "                            
+         echo Refreshing in: "$1"
+          free -hmt  
+          echo ==================================================================================
+          echo top memory hogs:  
+          memorybeast "$@"                        #cat /proc/swaps
+          if [[ "$#" == 1 ]]; then #Specify time for script refresh - and use format found in the sleep manual. For more info, try: "man sleep" in Bash - 
+          sleep "$1" #Do not run that as an argument to the script and do so, of course, without the quotation marks. 
+          fi  
+          echo refreshing stats | pv -qL 8
+          clear  
+          echo ""
+      fi     
+  done    
+  }
+
