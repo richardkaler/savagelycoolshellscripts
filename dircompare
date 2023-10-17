@@ -1,0 +1,49 @@
+#!/bin/bash
+#Stay tuned for more comments and edits  
+
+logloc="$HOME/tmp/dircompare.log"
+
+if [[ "$1" == "-h" ]]; then 
+   echo "----------------->Help Menu<-----------------" 
+   echo "Two directories are required for this diff wrapper to work"
+   echo "Ex: 'dircompare ~/Desktop/ ~/Documents'" 
+   exit 0 
+fi
+
+function diffarg {
+results=$(diff -qrs "$1" "$2") 
+
+while [[ -d "$1" ]] && [[ -d "$2" ]] 
+do
+
+if ! [[ -d "$1" ]] || ! [[ -d "$2" ]]; then  
+    echo Invalid input - Please enter two valid directories
+    echo Try 'dircompare -h'
+    exit 1
+elif [[ -n "$results" ]]; then
+    echo Results - comparing "$1" with "$2":
+    echo ----------------------------------------------------------------- 
+    echo "$results" | tee -a "$logloc"
+    echo ----------------------------------------------------------------- 
+    exit 0
+elif [[ -z "$results" ]]; then 
+    echo No relevant results - try something else 
+    exit 0
+else 
+    echo Error: something went wrong - check your syntax and try again
+    exit 1
+fi
+break 
+done
+}  
+
+
+if [[ "$#" -eq 2 ]]; then 
+    diffarg "$@" 
+    exit 0
+else 
+    echo Check your parameters: two arguments i.e., two directories to compare  
+    echo "Ex: 'dircompare ~/Desktop/ ~/Documents'" 
+    #echo Try 'dircompare -h'
+    exit 1
+fi
