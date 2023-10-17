@@ -1,0 +1,37 @@
+#!/bin/bash
+
+if [[ "$#" -lt 2 ]] || [[ "$1" == "-h" ]]; then
+      echo this script requires at least one argument
+      echo "Ex: 'readonly  dirname -protect'"
+      echo "Options: [ -protect  -unset ]"
+      echo "use -protect to lock and protect files; -unset to remove the file locks"
+      exit 1
+fi
+
+
+
+
+directory="$1"
+
+if [[ "$2" == "-protect" ]]; then
+    for fileitem in "$directory"/*; do
+        if [[ -f "$fileitem" ]]; then
+            if sudo chattr +i "$fileitem"; then
+                echo "$fileitem" secured from deletion
+            else
+                echo "$fileitem" remains unchanged
+            fi
+        fi
+    done
+elif [[ "$2" == "-unset" ]]; then
+    for fileitem in "$directory"/*; do
+        if [[ -f "$fileitem" ]]; then
+            if sudo chattr -i "$fileitem"; then
+                echo "$fileitem" protection unset - permissions removed
+            fi
+        fi
+    done
+else
+    echo "Invalid option. Use -protect to lock and protect files; -unset to remove the file locks."
+    exit 1
+fi
