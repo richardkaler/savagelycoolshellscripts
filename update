@@ -1,0 +1,25 @@
+#!/bin/bash
+#NOTE: This is a simple update script - and any administrator could benefit from this if he or she is not already automating apt updates. This can be modified for another package manager 
+
+if { 
+sudo apt-get update > /dev/null 2>&1 &&
+sudo apt-get upgrade -y > /dev/null 2>&1
+}; then 
+    {
+    echo  "System updated. Check logs if needed" 
+    echo  "System successfully updated" | tee -a ~/tmp/update.log > /dev/null
+    echo  "Log location: ~/tmp/update.log"
+    date >> ~/tmp/update.log        #date | tee -a  ~/tmp/update.log
+    echo ========================= >> ~/tmp/update.log
+    } 
+else 
+    {
+    echo "System failed to update" | tee -a  ~/tmp/update.log 
+    echo "Check logs for more details" 
+    echo "Log location: ~/tmp/update.log"
+    date >> ~/tmp/update.log         			#date | tee -a  ~/tmp/update.log
+    echo =========================  >> ~/tmp/update.log
+    } 
+fi 
+
+uptime -p #optional 
