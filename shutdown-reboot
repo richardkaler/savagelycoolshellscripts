@@ -1,0 +1,21 @@
+#!/bin/bash
+
+logvar="$HOME/tmp/shutdown-reboot" #log location - and this can change based on the needs of the admin 
+
+shutdownvar=$(sudo ausearch -i -m system_boot,system_shutdown | tail -4 | grep -i shutdown | wc -l) #use command line substitution to grep for the last four lines - and word count to total them 
+systembootvar=$(sudo ausearch -i -m system_boot,system_shutdown | tail -4 | grep -i system_boot | wc -l) #use command line substitution to grep for the last four lines - and word count to total them 
+
+
+total=$(($shutdownvar + $systembootvar)) #Evaluate the total by combining the two defined variables above 
+
+echo EVENT TOTAL: "$total" #Use the echo statement to print the total for the administrator 
+echo total number of shutdowns: "$shutdownvar" #Print total number of shutdowns
+echo total number of system boots: "$systembootvar" #print total number of boots 
+
+if [[ "$shutdownvar" -eq 0 ]]; then 
+    echo  -e "System likely booted following one or more unexpected shutdowns. Review sys logs for more details.\nA log for this script can be found at: $logvar" #Use echo print statement to indicate instability 
+else 
+    echo -e "the number of shutdowns is proportionate to the number of boots: System appears to be healthy at first glance. Review sys logs for more details.\nA log for this script can be found at: $logvar" #Use an alternate echo print statement to indicate stability 
+fi
+
+
