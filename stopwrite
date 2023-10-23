@@ -1,37 +1,66 @@
 #!/bin/bash
 
+#NOTE: For obvious reason this script should only be operated by root. For more information, consider running the chattr manual file via man chattr - as 
+#this is a VERY powerful command that when used properly can protect files but if use carelessly can lock files up or unrestrict files which need to be protected 
+#If you do not know what this script does, do not use it. It is also still in a testing phase but the results I have experienced are positive. I'd like to add 
+#command flags to make it a bit more intuitive.... 
+
+#Put this in /usr/local/bin/ ... this is where the local admin file should go - and these are files used by all users but they require root to run ... 
+#This file will run if you put it in a home directory but given chattr requires a sudo user to run, there's no point in giving this script access to a normal user
+#Even if that user did have access to it, unless he or she has root privileges, the code won't work... AGAIN: Use this with caution. If you are not a system 
+#administrator or if you are a young admininistrator who is unfamiliar with the Linux/Unix file hierarchy, this bad boy is not for you, dear friend. If you want
+#To test this out, do not use it on a live production system - use it on a virtual machine. It's probably safe to test on WSL within Windows since the NT files are 
+#different from those which are part of the Linux kernel and ultimately the NT files sit deeper than the Linux virtual engine on a Windows host ... 
+
 if [[ "$#" -lt 2 ]] || [[ "$1" == "-h" ]]; then
-      echo this script requires at least one argument
-      echo "Ex: 'readonly  dirname -protect'"
-      echo "Options: [ -protect  -unset ]"
-      echo "use -protect to lock and protect files; -unset to remove the file locks"
-      exit 1
+    echo "This script requires at least one argument."
+    echo "Ex: 'scriptname dirname -protect'"
+    echo "Options: [ -protect  -unset ]"
+    echo "Use -protect to lock and protect files; -unset to remove the file locks."
+    exit 1
 fi
 
-
-
-
-directory="$1"
-
-if [[ "$2" == "-protect" ]]; then
-    for fileitem in "$directory"/*; do
-        if [[ -f "$fileitem" ]]; then
-            if sudo chattr +i "$fileitem"; then
-                echo "$fileitem" secured from deletion
-            else
-                echo "$fileitem" remains unchanged
+if [[ -d "$1" ]]; then
+    directory="$1"
+    if [[ "$2" == "-protect" ]]; then
+        for fileitem in "$directory"/*; do
+            if [[ -e "$fileitem" ]]; then
+                if sudo chattr +i "$fileitem"; then
+                    echo "$fileitem secured from deletion."
+                else
+                    echo "Failed to secure $fileitem from deletion."
+                fi
             fi
-        fi
-    done
-elif [[ "$2" == "-unset" ]]; then
-    for fileitem in "$directory"/*; do
-        if [[ -f "$fileitem" ]]; then
-            if sudo chattr -i "$fileitem"; then
-                echo "$fileitem" protection unset - permissions removed
+        done
+    elif [[ "$2" == "-unset" ]]; then
+        for fileitem in "$directory"/*; do
+            if [[ -e "$fileitem" ]]; then
+                if sudo chattr -i "$fileitem"; then
+                    echo "$fileitem protection unset - permissions removed."
+                else
+                    echo "Failed to unset protection for $fileitem."
+                fi
             fi
-        fi
-    done
+        done
+    else
+        echo "Invalid option for a directory."
+        exit 1
+    fi
 else
-    echo "Invalid option. Use -protect to lock and protect files; -unset to remove the file locks."
-    exit 1
+    if [[ "$2" == "-protect" ]]; then
+        if sudo chattr +i "$1"; then
+            echo "$1 secured from deletion."
+        else
+            echo "Failed to secure $1 from deletion."
+        fi
+    elif [[ "$2" == "-unset" ]]; then
+        if sudo chattr -i "$1"; then
+            echo "$1 protection unset - permissions removed."
+        else
+            echo "Failed to unset protection for $1."
+        fi
+    else
+        echo "Invalid option for an individual file."
+        exit 1
+    fi
 fi
