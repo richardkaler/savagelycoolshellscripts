@@ -1,0 +1,22 @@
+#!/bin/bash
+#This is a cool little helper script I wrote to help folks find packages - rather than using apt and grep each time or, rather, having to remember the syntax to do so 
+
+
+if [[ -z "$1" ]] || [[ "$1" == "-h" ]]; then
+    echo Script requires at least one argument 
+    echo "Ex: 'searchinstalls wine' will search for the wine package" 
+elif [[ -n "$1" ]] && ! [[ "$1" == "-h" ]]; then
+    searchvar=$(apt list --installed | grep "$1")
+        if [[ -n "$searchvar" ]]; then
+            echo Found packages. Results: 
+            echo "$searchvar" 
+        else
+            echo Package has not been installed - search for something else or download package 
+            echo "Checking to see if package is available..." 
+                varfound=$(apt list | grep "$1")
+                    if [[ -n "$varfound" ]]; then
+                       echo Found something. the following packages are available:  
+                       echo "$varfound"  
+                    fi
+      fi
+fi
