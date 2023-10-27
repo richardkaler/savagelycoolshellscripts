@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash 
 
 #This is a cool little helper script I wrote to help folks find packages - rather than using apt and grep each time along with recalling the syntax to do so
 
@@ -9,18 +9,18 @@ searchagain() {
 if [[ -z "$1" ]] || [[ "$1" == "-h" ]]; then
     echo "Script requires at least one argument"
     echo "Ex: 'searchinstalls wine' will search for the wine package"
-elif [[ -n "$1" && ! "$1" == "-h" ]]; then
+fi
+
+if [[ -n "$1" ]] && [[ ! "$1" == "-h" ]]; then
     echo "Searching to see if the package is installed..."
-    searchvar=$(apt list --installed | grep "$1")
-    echo Unable to find packages when searching for: "\"$1\""
-    if [[ -n "$searchvar" ]]; then
-        echo "Found packages. Results:"
-        echo "$searchvar"
-        echo "====================================================================================="
-        exit 0
-    else
-        read -r -p "Are you satisfied with the results? Enter 'yes' or 'no' to search for more packages: " ans
-        if [[ "$ans" == "no" ]]; then
+    echo Results:      
+    sudo apt list --installed | grep "$1" 
+    echo "Finished searching"
+    echo "====================================================================================="
+    read -r -p "Are you satisfied with the results? Enter 'yes' or 'no' to search for more packages: " ans
+        if [[ "$ans" == "yes" ]]; then 
+        echo OK - exiting script 
+        elif [[ "$ans" == "no" ]]; then
             searchresult=$(searchagain "$@")
             if [[ -n "$searchresult" ]]; then
                 echo "Found packages. Results:"
@@ -33,8 +33,6 @@ elif [[ -n "$1" && ! "$1" == "-h" ]]; then
             sleep 1s
             echo "Found packages. Results:"
             searchagain "$@"
+            exit 0  
         fi
-        echo "OK: exiting script now"
-        exit 0
     fi
-fi
