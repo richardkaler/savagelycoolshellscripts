@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#This is a cool little helper script I wrote to help folks find packages - rather than using apt and grep each time along with recalling the syntax to do so 
+#This is a cool little helper script I wrote to help folks find packages - rather than using apt and grep each time along with recalling the syntax to do so
 
 searchagain() {
     apt list | grep "$1"
@@ -11,12 +11,13 @@ if [[ -z "$1" ]] || [[ "$1" == "-h" ]]; then
     echo "Ex: 'searchinstalls wine' will search for the wine package"
 elif [[ -n "$1" && ! "$1" == "-h" ]]; then
     echo "Searching to see if the package is installed..."
-    sleep 1s
     searchvar=$(apt list --installed | grep "$1")
+    echo Unable to find packages when searching for: "\"$1\""
     if [[ -n "$searchvar" ]]; then
         echo "Found packages. Results:"
         echo "$searchvar"
         echo "====================================================================================="
+        exit 0
     else
         read -r -p "Are you satisfied with the results? Enter 'yes' or 'no' to search for more packages: " ans
         if [[ "$ans" == "no" ]]; then
@@ -37,4 +38,3 @@ elif [[ -n "$1" && ! "$1" == "-h" ]]; then
         exit 0
     fi
 fi
-
