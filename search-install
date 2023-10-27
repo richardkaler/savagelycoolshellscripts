@@ -1,32 +1,40 @@
 #!/bin/bash
+
 #This is a cool little helper script I wrote to help folks find packages - rather than using apt and grep each time along with recalling the syntax to do so 
 
 searchagain() {
     apt list | grep "$1"
 }
 
-if [[ -z "$1" ]] || [[ "$1" == "-h" ]]; then 
-    echo Script requires at least one argument 
-    echo "Ex: 'searchinstalls wine' will search for the wine package" 
-elif [[ -n "$1" ]] && ! [[ "$1" == "-h" ]]; then 
-    echo "Searching to see if package is installed..." 
-    sleep 1s 
-    searchvar=$(apt list --installed | grep "$1") 
-        if [[ -n "$searchvar" ]]; then 
-            echo Found packages. Results: 
-            echo "$searchvar" 
-            echo        "=====================================================================================" 
-            read -r -p  "Did you find what you're looking for? Enter 'yes' or 'no' to search for more packages: " ans
-                if [[ "$ans" == "no" ]]; then 
-                    if [[ -n $(searchagain "$@") ]]; then 
-                        echo "Ok - searching for more packages" 
-                        sleep 1s
-                        echo "Found packages. Results:" 
-                        searchagain "$@" 
-                    fi
-                else                   
-                    echo OK: exiting script now
-                    exit 0  
-               fi  
-      fi
-fi 
+if [[ -z "$1" ]] || [[ "$1" == "-h" ]]; then
+    echo "Script requires at least one argument"
+    echo "Ex: 'searchinstalls wine' will search for the wine package"
+elif [[ -n "$1" && ! "$1" == "-h" ]]; then
+    echo "Searching to see if the package is installed..."
+    sleep 1s
+    searchvar=$(apt list --installed | grep "$1")
+    if [[ -n "$searchvar" ]]; then
+        echo "Found packages. Results:"
+        echo "$searchvar"
+        echo "====================================================================================="
+    else
+        read -r -p "Are you satisfied with the results? Enter 'yes' or 'no' to search for more packages: " ans
+        if [[ "$ans" == "no" ]]; then
+            searchresult=$(searchagain "$@")
+            if [[ -n "$searchresult" ]]; then
+                echo "Found packages. Results:"
+                echo "$searchresult"
+            else
+                echo "Try altering your search for another item"
+            fi
+        else
+            echo "Ok - searching for more packages"
+            sleep 1s
+            echo "Found packages. Results:"
+            searchagain "$@"
+        fi
+        echo "OK: exiting script now"
+        exit 0
+    fi
+fi
+
