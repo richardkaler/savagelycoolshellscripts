@@ -1,22 +1,32 @@
 #!/bin/bash
-#This is a cool little helper script I wrote to help folks find packages - rather than using apt and grep each time or, rather, having to remember the syntax to do so 
+#This is a cool little helper script I wrote to help folks find packages - rather than using apt and grep each time along with recalling the syntax to do so 
 
+searchagain() {
+    apt list | grep "$1"
+}
 
-if [[ -z "$1" ]] || [[ "$1" == "-h" ]]; then
+if [[ -z "$1" ]] || [[ "$1" == "-h" ]]; then 
     echo Script requires at least one argument 
     echo "Ex: 'searchinstalls wine' will search for the wine package" 
-elif [[ -n "$1" ]] && ! [[ "$1" == "-h" ]]; then
-    searchvar=$(apt list --installed | grep "$1")
-        if [[ -n "$searchvar" ]]; then
+elif [[ -n "$1" ]] && ! [[ "$1" == "-h" ]]; then 
+    echo "Searching to see if package is installed..." 
+    sleep 1s 
+    searchvar=$(apt list --installed | grep "$1") 
+        if [[ -n "$searchvar" ]]; then 
             echo Found packages. Results: 
             echo "$searchvar" 
-        else
-            echo Package has not been installed - search for something else or download package 
-            echo "Checking to see if package is available..." 
-                varfound=$(apt list | grep "$1")
-                    if [[ -n "$varfound" ]]; then
-                       echo Found something. the following packages are available:  
-                       echo "$varfound"  
+            echo        "=====================================================================================" 
+            read -r -p  "Did you find what you're looking for? Enter 'yes' or 'no' to search for more packages: " ans
+                if [[ "$ans" == "no" ]]; then 
+                    if [[ -n $(searchagain "$@") ]]; then 
+                        echo "Ok - searching for more packages" 
+                        sleep 1s
+                        echo "Found packages. Results:" 
+                        searchagain "$@" 
                     fi
+                else                   
+                    echo OK: exiting script now
+                    exit 0  
+               fi  
       fi
-fi
+fi 
