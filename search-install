@@ -17,7 +17,7 @@ if [[ -n "$1" ]] && [[ ! "$1" == "-h" ]]; then
     sudo apt list --installed | grep "$1" 
     echo "Finished searching"
     echo "====================================================================================="
-    read -r -p "Are you satisfied with the results? Enter 'yes' or 'no' to search for more packages: " ans
+    read -r -p "Are you satisfied with the results? Enter 'yes' or 'no' to search for available packages: " ans
         if [[ "$ans" == "yes" ]]; then 
         echo OK - exiting script 
         elif [[ "$ans" == "no" ]]; then
