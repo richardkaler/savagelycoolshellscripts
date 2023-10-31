@@ -3,6 +3,11 @@
 #Search for externally mounted drives and use the df command to total them. NOTE: This script does not promise to detect all externally mounted drives but it will find a good number of them
 #I may write something that's more robust but this is handy as it is .... many drives are commonly mounted on either media or mount as the first directory under... 
 
+#NOTE: There is a flaw to this script in that Linux cannot recognize the difference between a hard in virtual vs phyiscal space. For instance of someone is searching 
+#for encrypted partitions which require a separate tool to read and are mounted as psuedo files, Linux cannot detect whether or not they are real. 
+#I have experienced an issue with the script discovering Veracrypt and Bitlocker drives with some redundancy and in the case of Veracrypt, it is giving output on 
+#drives that are no longer mounted or information for slots that have no data ... I'll have to work on this more later. 
+
 mntfind() {
 find /mnt -mindepth 1 -maxdepth 1 
 }
