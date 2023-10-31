@@ -1,0 +1,31 @@
+#!/bin/bash 
+
+#Search for externally mounted drives and use the df command to total them. NOTE: This script does not promise to detect all externally mounted drives but it will find a good number of them
+#I may write something that's more robust but this is handy as it is .... many drives are commonly mounted on either media or mount as the first directory under... 
+
+mntfind() {
+find /mnt -mindepth 1 -maxdepth 1 
+}
+
+mntmedia() {
+    find /media -mindepth 1 -maxdepth 1 
+}
+
+echo "The following external drives have been detected though others may also be present: " 
+echo ============================
+mntfind "$@" 
+echo ============================
+mntmedia "$@"
+
+echo --------------------------------------------------
+find /mnt /media -mindepth 1 -maxdepth 1 | while IFS= read -r drive 
+do
+    avail=$(df -h "$drive" |  awk '{ print $4 }' | tail -1) 
+    total=$(df -h "$drive" | awk '{ print $2 }' | tail -1) 
+    left=$(echo "$avail") 
+    totalfig=$(echo "$total")  
+    echo Total size of "$drive": "$totalfig" 
+    echo Available space on "$drive": "$left"
+    echo --------------------------------------------------
+done
+
