@@ -1,0 +1,28 @@
+#!/bin/bash
+
+#This is potentially over kill but it works if you want to protect your packages from being broken by dependencies which are removed when other packages are installed or - well, we all get impatient 
+#in a hurry then mistakenly allow apt or apt-get to remove something that should have stayed put. There is this for that. NOTE: This is not an intelligently managing solution. It works but it's an all-or-nothing
+#Affair. If you installed it, it's marked as manually installed. If you don't have time to sift through every single installed program. This is still in its testing phase. 
+#I have not deployed this in a production environment - and while I do not necessarily advise against that, caution should be used. This has only been used on Ubuntu and I suspect if you are using something like
+#Debian, it's not necessary. 
+
+log_file="/home/username/tmp/markmanual.log"
+
+apt_list_output=$(apt list --installed | grep -v 'Listing...' | awk -F '/' '{print $1}')
+
+while IFS= read -r package
+do
+    echo "Working on $package ..."
+    supporting_package=$(dpkg-query -S "$package" | cut -d':' -f1 | awk -F ': ' '{print $1}')
+    if sudo apt-mark manual "$supporting_package"; then
+        printf "The following package '%s' " "$supporting_package" >> "$log_file"
+        printf "has been marked as manually installed.\n" >> "$log_file"
+    else
+        printf "Error marking package '%s' as manually installed.\n" "$supporting_package" >> "$log_file"
+    fi
+
+done <<< "$apt_list_output"
+date >> "$log_file"
+printf "===============================\n" >> "$log_file"
+printf "Finished marking packages - nothing to do.\n" >> "$log_file"
+#date
