@@ -7,7 +7,6 @@
 
 #Search for externally mounted drives and use the df command to total them. NOTE: This script does not promise to detect all externally mounted drives but it will find a good number of them
 
-
 mntfind() {
 find /mnt -mindepth 1 -maxdepth 1
 }
@@ -25,6 +24,7 @@ echo --------------------------------------------------
 echo Calculated info for common mount points formatted in ext4:
 
 drivescalc() {
+echo "$(df -hT | head -1)"
 df -hT | grep ext4
 }
 drivescalc "$@"
@@ -70,4 +70,3 @@ done
 }
 
 mntvalmount
-
