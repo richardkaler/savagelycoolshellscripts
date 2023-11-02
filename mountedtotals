@@ -1,36 +1,64 @@
 #!/bin/bash 
+#NOTE: This is a difficult script to write - and mostly because Linux has so many different ways that it mounts drives and there are so many different mounts which
+#can be created to mount them on. Because everything in Linux is a file and any file can be created so long as a user has root access, a drive can be mounted 
+#technically anywhere that root wants to put it. All things said, those parameters limit my scripting options but this is a good start for a person having no 
+#Idea how many mounted drives are connected to a system. For this to work, you have to at least narrow down the number of drives which need to be searched and 
+#there's just no one-size-fixes all way to go about it... Think about priority, think about what's feasible based on time constraints ... then run this 
 
 #Search for externally mounted drives and use the df command to total them. NOTE: This script does not promise to detect all externally mounted drives but it will find a good number of them
-#I may write something that's more robust but this is handy as it is .... many drives are commonly mounted on either media or mount as the first directory under... 
-
-#NOTE: There is a flaw to this script in that Linux cannot recognize the difference between a hard in virtual vs phyiscal space. For instance of someone is searching 
-#for encrypted partitions which require a separate tool to read and are mounted as psuedo files, Linux cannot detect whether or not they are real. 
-#I have experienced an issue with the script discovering Veracrypt and Bitlocker drives with some redundancy and in the case of Veracrypt, it is giving output on 
-#drives that are no longer mounted or information for slots that have no data ... I'll have to work on this more later. 
 
 mntfind() {
-find /mnt -mindepth 1 -maxdepth 1 
+find /mnt -mindepth 1 -maxdepth 1
 }
 
 mntmedia() {
-    find /media -mindepth 1 -maxdepth 1 
+    find /media -mindepth 1 -maxdepth 1
 }
 
-echo "The following external drives have been detected though others may also be present: " 
+echo "The following external drives have been detected though others may also be present: "
 echo ============================
-mntfind "$@" 
+mntfind "$@"
 echo ============================
 mntmedia "$@"
-
 echo --------------------------------------------------
-find /mnt /media -mindepth 1 -maxdepth 1 | while IFS= read -r drive 
+mntmounted() {
+find /media -mindepth 1 -maxdepth 1 -type d  | while IFS= read -r drive
 do
-    avail=$(df -h "$drive" |  awk '{ print $4 }' | tail -1) 
-    total=$(df -h "$drive" | awk '{ print $2 }' | tail -1) 
-    left=$(echo "$avail") 
-    totalfig=$(echo "$total")  
-    echo Total size of "$drive": "$totalfig" 
-    echo Available space on "$drive": "$left"
-    echo --------------------------------------------------
+rootval=$(df -h "/"  | awk '{ print $1 }' | tail -1)
+pushd "$drive" > /dev/null || return
+varpoint=$(df -h "$PWD" | tail -1 | awk '{ print $1 }')
+if  [[ "$varpoint" == "/dev/mapper/vgubuntu-root" ]]; then
+echo > /dev/null
+else
+outputsize=$(df -h "$PWD")
+if ! [[ "$rootval" == "$outputsize" ]]; then
+echo "$outputsize"
+fi
+echo =========================
+fi
 done
+}
+mntmounted
+
+mntvalmount() {
+find /mnt -mindepth 1 -maxdepth 1 -type d  | while IFS= read -r drive
+do
+rootval=$(df -h "/"  | awk '{ print $1 }' | tail -1)
+pushd "$drive" > /dev/null || return
+varpoint=$(df -h "$PWD" | tail -1 | awk '{ print $1 }')
+varcontents=$(ls -l "$drive")
+if  [[ "$varpoint" == "/dev/mapper/vgubuntu-root" && -n "$varcontents" ]]; then
+echo unable to determine mount point but found the following data on "$drive"
+echo "$varcontents"
+else
+outputsize=$(df -h "$PWD")
+if ! [[ "$rootval" == "$outputsize" ]]; then
+echo "$outputsize"
+fi
+echo =========================
+fi
+done
+}
+
+mntvalmount
 
