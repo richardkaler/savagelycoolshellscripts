@@ -7,6 +7,7 @@
 
 #Search for externally mounted drives and use the df command to total them. NOTE: This script does not promise to detect all externally mounted drives but it will find a good number of them
 
+
 mntfind() {
 find /mnt -mindepth 1 -maxdepth 1
 }
@@ -47,6 +48,7 @@ done
 }
 mntmounted
 
+echo Unable to determine the precise mount details of some of the following
 mntvalmount() {
 find /mnt -mindepth 1 -maxdepth 1 -type d  | while IFS= read -r drive
 do
@@ -55,7 +57,7 @@ pushd "$drive" > /dev/null || return
 varpoint=$(df -h "$PWD" | tail -1 | awk '{ print $1 }')
 varcontents=$(ls -l "$drive")
 if  [[ "$varpoint" == "/dev/mapper/vgubuntu-root" && -n "$varcontents" ]]; then
-echo unable to determine mount point but found the following data on "$drive"
+echo Found the following data on "$drive"
 echo "$varcontents"
 else
 outputsize=$(df -h "$PWD")
