@@ -21,6 +21,13 @@ mntfind "$@"
 echo ============================
 mntmedia "$@"
 echo --------------------------------------------------
+echo Calculated info for common mount points formatted in ext4:
+
+drivescalc() {
+df -hT | grep ext4
+}
+drivescalc "$@"
+echo --------------------------------------------------
 mntmounted() {
 find /media -mindepth 1 -maxdepth 1 -type d  | while IFS= read -r drive
 do
