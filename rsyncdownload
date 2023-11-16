@@ -1,0 +1,54 @@
+#!/bin/bash
+
+#NOTE: This iteration brings a new feature my script. The value of this script is that it accepts wildcards - though on the flipside because wildcards expand, without limiting a time duration for 
+#rsync, the user runs into problems when rsync decides to keep doing its thing - or downloading extraneous files which have nothing to do with the desired data. To solve this temporarily I have 
+#included a time out feature. There are other ways to solve it but given how wildcards or "globs" behave, it's easy to run into trouble here. I may be able to limit the activity by another syntax 
+#But this is safe as I have it. It's actually quite cool. Have fun! 
+
+if [[ "${1}" == "-h" ]]; then
+   echo "Enter a remote file to search for and local destination for transfer"
+   echo Ex: rsyncdownload file dir
+   echo "Limit the running duration of rsync to limit data"
+   echo "Ex: rsyncdownload file dir 15m - and rsync will hault after 15 minutes"
+   exit 0
+elif [[ "$#" -lt  2 ]]; then
+   echo "Error: missing arguments. Enter a remote file and local destination for transfer"
+    echo Ex: rsync-download file dir
+    exit 1
+elif ! [[ -d "${2}" ]]; then
+    echo Error - invalid location for destination.
+    echo "${2}" is not a directory - check spelling and review syntax
+fi
+
+
+logloc="${HOME}/tmp/rsync-download.log"
+
+#NOTE: Make sure the entire path is included for the parent
+server="username@hostname:directory/"
+
+filearg="${1}"
+
+while :      #cat "${filearg}" | while read -r line
+do
+    if {
+        echo attempting to download "${filearg}"
+        if [[ "$#" -eq 2 ]]; then
+            rsync -vrP -e  ssh --timeout=3 "${server}"/"*${filearg}*" "${2}"
+        elif [[ "$#" -eq 3 ]]; then
+            timeout "$3" rsync -vrP -e  ssh --timeout=3 "${server}"/"*${filearg}*" "${2}"
+        fi
+        echo the following rsync processes related to the transfer of string \"${1}\" were active: | tee -a ~/tmp/rsync-file-download-proc.log
+        processactive=$(ps aux | grep -i rsyn | grep "${1}")
+        echo "${processactive}" | tee -a ~/tmp/rsync-file-download-proc.log &&
+        date | tee -a ~/tmp/rsync-file-download-proc.log
+        echo ============================================= | tee -a ~/tmp/rsync-file-download-proc.log
+        echo "==================================================="
+    }; then
+       exit 0
+        else
+    {
+        echo failed to process "${filearg}" | tee -a "${logloc}"
+        exit 1
+    }
+   fi
+done
