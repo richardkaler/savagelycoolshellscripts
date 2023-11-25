@@ -2,7 +2,7 @@
 
 echo "Review these notes regarding the d-bus service:
 
-D-Bus helps with:
+d-bus helps with:
 
 * Service Dependencies: Various services, including PulseAudio and Bluetooth, depend on D-Bus for communication. If there was a hiccup in the D-Bus service, it could have affected the functionality of other dependent services.
 
@@ -16,7 +16,10 @@ Are you ready to restart the dbus daemon now? Enter \"yes\" or \"no\": " ans
 
    if [[ "$ans" == yes ]]; then
 
-echo -e "Attempting to restart dbus in efforts to restore communication between D-Bus service and other essential services which\ndepend on it. Note - you may be forced to log out."
+echo "Attempting to restart dbus in efforts to restore communication between D-Bus service and other essential services which
+depend on it. Note - you may be forced to log out."
+echo restarting daemon in 5 seconds ...
+sleep 5s
 sudo systemctl restart dbus
 else
     echo "No changes to the system have been made - exiting script now"
