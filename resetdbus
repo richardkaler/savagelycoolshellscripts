@@ -1,0 +1,23 @@
+#!/bin/bash
+
+echo "Review these notes regarding the d-bus service:
+
+dbus helps with:
+
+* Service Dependencies: Various services, including PulseAudio and Bluetooth, depend on D-Bus for communication. If there was a hiccup in the D-Bus service, it could have affected the functionality of other dependent services.
+
+* Communication Errors: D-Bus is responsible for communication between different parts of the desktop environment. If there was a communication error or if the D-Bus session became corrupted, restarting it can clear any issues and establish a fresh communication channel.
+
+* Session Management: D-Bus is involved in managing sessions and interprocess communication within a user's desktop session. Restarting it can effectively reset the session environment."
+#echo ""
+
+   read -r -p  "
+Are you ready to restart the dbus daemon now? Enter \"yes\" or \"no\": " ans
+
+   if [[ "$ans" == yes ]]; then
+
+echo -e "Attempting to restart dbus in efforts to restore communication between D-Bus service and other essential services which\ndepend on it. Note - you may be forced to log out."
+sudo systemctl restart dbus
+else
+    echo "No changes to the system have been made - exiting script now"
+fi
