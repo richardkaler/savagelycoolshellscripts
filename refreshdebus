@@ -2,7 +2,7 @@
 
 echo "Review these notes regarding the d-bus service:
 
-dbus helps with:
+D-Bus helps with:
 
 * Service Dependencies: Various services, including PulseAudio and Bluetooth, depend on D-Bus for communication. If there was a hiccup in the D-Bus service, it could have affected the functionality of other dependent services.
 
