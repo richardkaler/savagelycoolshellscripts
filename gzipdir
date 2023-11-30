@@ -1,0 +1,54 @@
+#!/bin/bash -e
+
+if [[ "$1" == "-h" ]]; then 
+    echo =========================== Help Menu  =========================== 
+    echo "Gzipdir: A simple wrapper to conveniently compress directory files" 
+    echo "This script requires one argument" 
+    echo "Ex: gzipdir [ directory ]" 
+    echo ==================================================================
+    exit 0     
+elif [[ -z "$1" ]]; then
+    echo "Error: this script requires at least one argument"
+    echo "Enter the name of a directory to compress"
+    echo "Ex: gzipdirs [ directory ]"
+    exit 1
+elif ! [[ -d "$1" ]]; then 
+    echo "Error: Invalid parameter: please enter a valid directory to compress files"
+    echo "Ex: gzipdir [ directory ]" 
+    exit 1 
+else 
+
+
+
+logloc="$HOME/tmp/gzipdir.log"
+
+date  | tee -a "$logloc"
+
+dirsizecal=$(/home/richard/bin/total "$1") 
+
+echo original size of directory: "$dirsizecal" | tee -a "$logloc"
+
+findgzip() {
+    find "$1" -type f | while IFS= read -r item 
+do 
+    echo attempting to compress "$item" | tee -a "$logloc"
+    if tar -cvf - "$item" | gzip -v9 > "$item.tar.gz" | tee -a  "$logloc"; then 
+    echo finished compressing "$item" | tee -a "$logloc"
+    echo removing old file | tee -a "$logloc" 
+    rm "$item" | tee -a "$logloc"
+else 
+    echo failed to compress "$item" | tee -a "$logloc"
+    fi 
+    done
+}
+
+
+if findgzip "$*"; then 
+    echo finished compressing all files within "$1"  | tee -a "$logloc"
+    echo size of directory following file compressions: "$dirsizecal" | tee -a "$logloc"
+    exit 0 
+else 
+    echo failed to compress at least some files  | tee -a "$logloc"
+    exit 1 
+fi
+fi
