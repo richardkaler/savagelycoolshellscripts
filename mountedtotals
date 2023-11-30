@@ -7,6 +7,37 @@
 
 #Search for externally mounted drives and use the df command to total them. NOTE: This script does not promise to detect all externally mounted drives but it will find a good number of them
 
+totalamnt() {
+  sum=0
+  while IFS= read -r item; do
+    size=$(echo "$item" | sed 's/.$//')  # Remove the last character (the percentage sign)
+    unit=$(echo "$item" | sed 's/[0-9.]//g')  # Extract the unit (e.g., G, T, M)
+
+    # Convert sizes to kilobytes for consistent unit
+    case "$unit" in
+      G) size_kb=$(echo "$size * 1024 * 1024" | bc) ;;
+      T) size_kb=$(echo "$size * 1024 * 1024 * 1024" | bc) ;;
+      M) size_kb=$(echo "$size * 1024" | bc) ;;  # Convert megabytes to kilobytes
+      *) size_kb=$size ;;
+    esac
+
+  rounded_size_kb=$(echo "scale=0; ${size_kb:-0} / 1" | bc)
+  ((sum += rounded_size_kb))
+  done < <(df -hT | grep -v Avail | grep -v tmpfs | grep -v "/dev/fuse" | awk '{ print $5 }')
+
+ sum_gb=$(echo "$sum / 1024 / 1024" | bc) > /dev/null
+ if (( sum_gb > 0 )); then
+ echo Total amount of free space: "${sum_gb} GB"
+ fi
+}
+
+
+if [[ "$1" == "-h" ]]; then
+    echo "Only one argument is possible"
+    echo "Try \"mountedtotals mounts\""
+    exit 0
+fi
+
 mntfind() {
 find /mnt -mindepth 1 -maxdepth 1
 }
@@ -15,58 +46,45 @@ mntmedia() {
     find /media -mindepth 1 -maxdepth 1
 }
 
-echo "The following external drives have been detected though others may also be present: "
+mntdevmapper() {
+    find /dev/mapper -mindepth 1 -maxdepth 1
+}
+
+
+
+if [[ "$1" == "mounts" ]]; then
+echo "The following external mount points have been detected though others may also be present: "
 echo ============================
 mntfind "$@"
 echo ============================
 mntmedia "$@"
-echo --------------------------------------------------
-echo Calculated info for common mount points formatted in ext4:
+
+echo ============================
+mntdevmapper "$@"
+else
+
+
+
 
 drivescalc() {
 echo "$(df -hT | head -1)"
-df -hT | grep ext4
+echo Drives formatted in native ext4:
+echo ==================================
+df -hT | grep ext4  
+echo Drives formatted with exfat:
+echo ==================================
+df -hT | grep exfat
+echo Drives encrypted with Bitlocker:
+echo ==================================
+df -hT | grep bitlk
+echo Drives encrypted with Veracrypt:
+echo ==================================
+df -hT | grep veracrypt
+#veracryptmnt
 }
-drivescalc "$@"
-echo --------------------------------------------------
-mntmounted() {
-find /media -mindepth 1 -maxdepth 1 -type d  | while IFS= read -r drive
-do
-rootval=$(df -h "/"  | awk '{ print $1 }' | tail -1)
-pushd "$drive" > /dev/null || return
-varpoint=$(df -h "$PWD" | tail -1 | awk '{ print $1 }')
-if  [[ "$varpoint" == "/dev/mapper/vgubuntu-root" ]]; then
-echo > /dev/null
-else
-outputsize=$(df -h "$PWD")
-if ! [[ "$rootval" == "$outputsize" ]]; then
-echo "$outputsize"
+drivescalc #"$@"
 fi
-echo =========================
-fi
-done
-}
-mntmounted
+echo ==================================
+totalamnt
 
-echo Unable to determine the precise mount details of some of the following
-mntvalmount() {
-find /mnt -mindepth 1 -maxdepth 1 -type d  | while IFS= read -r drive
-do
-rootval=$(df -h "/"  | awk '{ print $1 }' | tail -1)
-pushd "$drive" > /dev/null || return
-varpoint=$(df -h "$PWD" | tail -1 | awk '{ print $1 }')
-varcontents=$(ls -l "$drive")
-if  [[ "$varpoint" == "/dev/mapper/vgubuntu-root" && -n "$varcontents" ]]; then
-echo Found the following data on "$drive"
-echo "$varcontents"
-else
-outputsize=$(df -h "$PWD")
-if ! [[ "$rootval" == "$outputsize" ]]; then
-echo "$outputsize"
-fi
-echo =========================
-fi
-done
-}
 
-mntvalmount
