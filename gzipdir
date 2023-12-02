@@ -45,7 +45,8 @@ else
 
 if findgzip "$*"; then 
     echo finished compressing all files within "$1"  | tee -a "$logloc"
-    echo size of directory following file compressions: "$dirsizecal" | tee -a "$logloc"
+    postsize=$(/home/richard/bin/total "$1")
+    echo size of directory following file compressions: "$postsize" | tee -a "$logloc"
     exit 0 
 else 
     echo failed to compress at least some files  | tee -a "$logloc"
