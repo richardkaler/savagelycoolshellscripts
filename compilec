@@ -1,0 +1,17 @@
+#!/bin/bash
+
+function compile {
+cc "${1}" -o "${2}"
+}
+
+if [[ "${1}" == "-h" ]]; then 
+    #echo "Program requires two arguments:" 
+    echo "Enter name of program followed by desired compiled name"
+   echo "Ex: compilec program executable-name"
+elif  compile "$@" > /dev/null; then 
+    echo "$1" successfully compiled.
+    echo You can now run "$2"
+else 
+    echo "Failed to compile program"
+fi
+ 
