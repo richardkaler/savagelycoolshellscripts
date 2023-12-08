@@ -1,0 +1,54 @@
+    #!/bin/bash
+
+    if [[ -z "$1" ]]; then
+    echo "This script requires an argument."
+    echo "Try 'rename-single-index -h' for help."
+       exit 1
+    fi
+
+    if [[ "$1" == "-h" ]]; then
+        echo "================== Help Menu ========================="
+        echo "This script requires two arguments:"
+        echo "Ex: rename-single-index [ ~/Desktop ] [ \"file name\" ]"
+        echo "Changes 'file name' in ~/Desktop to 'file_name'"
+        echo -e "Use quotes or wildcards to reference the file"
+        echo "[ ~/Desktop ] [ file*name (or) \"file name\" ]: \"file_name\""
+        echo "================= rename-single-index =================="
+    exit 0
+fi
+
+directory="$1"
+search_string="$2"
+
+    varfind=$(find "$directory" -maxdepth 2 -iwholename "*$search_string*")
+
+    if [[ -z "$varfind" ]]; then
+        echo "No results - please enter a valid string."
+        echo "Also consider altering your syntax."
+        else
+        index=1
+        echo "Matching files found:"
+        while IFS= read -r fileitem; do
+            echo "$index. $fileitem"
+            ((index++))
+         done <<< "$varfind"
+
+    read -r -p "Enter the number of the file you want to rename. Press ctrl+c to exit the script: " file_index
+
+    if [[ "$file_index" -gt 0 && "$file_index" -le "$index" ]]; then
+        selected_file=$(sed -n "${file_index}p" <<< "$varfind")
+        new_name=$(echo "$selected_file" | tr '[ )](*!{}&^%$' '_')
+        logloc="$HOME/tmp/remove-whitespace-rename.log"
+
+        if mv "$selected_file" "$new_name" | tee -a "$logloc"; then
+            echo "Success! Renamed '$selected_file' to '$new_name'"
+        else
+            echo "Error: failed to rename file '$selected_file'"
+            echo "Check your syntax or review."
+            exit 1
+        fi
+        echo "Finished processing files."
+    else
+        echo "Operation aborted."
+    fi
+fi
