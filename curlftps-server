@@ -1,0 +1,18 @@
+#!/bin/bash 
+
+#This is just a one-liner... I could make this with more options but I didn't have time. If you have an FTP server without SFTP capabilities. Maybe you can do SSH but little else. This script takes care of that 
+#by combing FTP in curlftps 
+
+#If you want to be more flexibie ... I'll just edit this so that it takes "$1" as an argument ... I'll rewrite it later. 
+
+
+sudo curlftpfs -o umask=0777,uid=1000,gid=1000,allow_other ftp://username@192.168.x.x /mnt/dir
+
+#Or you can do: 
+
+dest="$1"
+#curlftpfs -o umask=0777,uid=1000,gid=1000,allow_other ftp://username@$"dest" /mnt/dir #there are a lot of things a person can do with this but I didn't have time to write out a full script. This is a command 
+#that a lot of people don't know and that's why I posted it. 
+
+#NOTE: If someone is bored and wants to play with this, you can easily pass nodes or what not as arguments: mount points, sources ... but if there are too many command flag options, the script is no longer 
+#simple which defeats its purpose. 
