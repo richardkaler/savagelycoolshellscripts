@@ -1,4 +1,5 @@
     #!/bin/bash
+    #Still in the editing phase. Perhaps the help menu could become more robust. I will add more comments if I have time as well too. 
 
     if [[ -z "$1" ]]; then
     echo "This script requires an argument."
