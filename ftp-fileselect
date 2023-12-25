@@ -1,0 +1,116 @@
+#!/bin/bash 
+#This is a work in progress but it is going places
+# Reference on temp dirs: https://www.pixelstech.net/article/1577768087-Create-temp-file-in-Bash-using-mktemp-and-trap
+
+
+if [[ -e "/tmp/templist" ]]; then
+rm -r "/tmp/templist"
+fi
+pushd /tmp/ > /dev/null || return
+clear
+
+execlist="$(mktemp)"
+nametemp="$PWD/templist"
+
+trap 'rm -f "$execlist"' EXIT
+
+popd || return
+
+location="/home/user/dir/"
+
+
+echo "==========> ftp-fileselect: bulk file transfers <=========="
+echo "Type \"exit\" to end script immediately"
+while :
+do
+    read -r -p "Enter string for file search. Enter \"done\" when finished building list: " item
+
+    if ! [[ "$item" == "done" ]] && [[ -z "$item" ]]; then
+        echo "No items to process. Try running the script again - and enter a valid file"
+        echo "exiting script"
+        exit 1
+    elif [[ "$item" == "done" ]]; then
+    break
+    elif [[ "$item" == "exit" ]]; then
+        echo OK - exiting script
+        exit 0
+    fi
+
+    formats=(
+        "*.mp4"
+        "*.avi"
+        "*.mkv"
+        "*.mov"
+        "*.wmv"
+    )
+
+
+
+find "$location" -type f -iname "*$item*" |  while IFS= read -r filename
+    do
+    echo processing "$filename"
+        for extension in "${formats[@]}"
+            do
+                #match=$(find "$location" -type f -iwholename "$filename" -iname "$extension")
+                match2=$(find "$location" -type f -iname "*$item*" -iname "$extension")
+                #if [[ -n "$match" ]]; then #This marks the section of original code. I commented it out for a reason. Unless you have a specific use case, keep it uncommented. 
+                #        echo got a hit for a file with an "$extension" extension
+                #        echo "$match" | sed 's/^/"/;s/$/"/' | tee -a  "$execlist"
+                grepcheck=$(grep "$filename" "$execlist")
+                if [[ -n "$match2" ]] && [[ -z "$grepcheck" ]]; then
+                        echo got a hit for a file with an "$extension" extension
+                        echo "$match2" | sed 's/^/"/;s/$/"/' | tee -a  "$execlist"
+                elif [[ -z "$match" ]]; then
+                        echo no results for "$extension"
+                fi
+                #done
+
+        done
+done
+done
+emptycheck=$(cat "$execlist" | wc -l)
+
+if  ! [[ -e  "$execlist" ]]; then
+echo nothing to process
+echo exiting script
+exit 0
+elif [[ "$emptycheck" == "0" ]]; then
+echo nothing to process
+echo exiting script
+exit 0
+fi
+
+
+echo Review the list of files to transfer below.
+
+unlink "$nametemp" > /dev/null
+ln -s "$execlist" "$nametemp"
+
+echo "The following files are queued for transfer:"
+echo "==========================================="
+cat "$execlist"
+echo "==========================================="
+echo "Type vim $nametemp in another window if you need to edit this transfer list"
+read -r -p "Ready to transfer the files on the list: yes or no?: " transq
+
+if [[ "$transq" == "yes" ]]; then
+    ftpsend() {
+        remotedir="dir/"
+        while IFS= read -r line
+        do
+            lftp -u pass,pass x.x.x.x <<SCRIPT_END
+            cd "$remotedir"
+            put $line
+SCRIPT_END
+        done < "$execlist"
+    }
+
+    if ftpsend; then
+        echo "Processed file transfer"
+    else
+        echo "Failed to process file transfer"
+    fi
+else
+    echo "OK - no files will be transferred. Exiting script"
+
+fi
