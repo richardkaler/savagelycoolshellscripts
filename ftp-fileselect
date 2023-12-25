@@ -60,7 +60,7 @@ find "$location" -type f -iname "*$item*" |  while IFS= read -r filename
                 if [[ -n "$match2" ]] && [[ -z "$grepcheck" ]]; then
                         echo got a hit for a file with an "$extension" extension
                         echo "$match2" | sed 's/^/"/;s/$/"/' | tee -a  "$execlist"
-                elif [[ -z "$match" ]]; then
+                elif [[ -z "$match2" ]]; then
                         echo no results for "$extension"
                 fi
                 #done
