@@ -1,0 +1,65 @@
+#!/bin/bash
+
+#This script calculates the hash values for either a single file or directory 
+
+
+logloc="$HOME/tmp/hashfiles"
+dirloc="$1"
+
+
+
+if  ! sudo -l | grep -iq all; then 
+    echo "You are running this command as $(whoami)" 
+    echo "You do not have full sudo access"
+    echo "For full use of this command, you do need sudo privileges" 
+    echo "Proceeding anyway" 
+fi
+
+
+if [[ -z "$1" ]] ||  [[ ! -d "$1" && ! -f "$1" ]]; then 
+    echo "Enter a directory or file to calculate hash values"
+    echo "Script requires at least one argument" 
+    exit 1 
+fi
+
+
+
+if [[ "$1" == "-h" ]]; then 
+    echo "===========> HELP MENU <==========="
+    echo "Calculates file hashes using sha256sum algorithm"  
+    echo "Script requires at least one argument"  
+    echo "Ex: hashfiles [ /etc/shadow ] || [[ media.mp4 ]]" 
+    echo "Hash password files || hash media item" 
+    echo "==================================="
+    exit 0 
+fi
+
+hashv() {
+echo "Calculated hash for '$1': $(sha256sum "$1" | awk '{ print $1 }')"
+}
+
+
+
+if [[ -f "$1" ]]; then 
+  hashv "$1"
+exit 0 
+fi
+
+count=1
+echo "Calculating hash values in one second:"
+sleep 1s
+find "$dirloc" -type f |  while IFS= read -r fileitem
+do
+    findval=$(find "$dirloc"  | wc -l)  
+    if [[ $count -gt $findval ]]; then 
+       break 
+   else  
+       hashcomp() {
+          echo "$fileitem" | sha256sum  
+      } 
+      echo file $count: "$fileitem": "$(hashcomp)"
+    ((count++))
+    #sleep 1s 
+    fi    
+done
+
