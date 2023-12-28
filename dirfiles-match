@@ -1,51 +1,64 @@
-#!/bin/bash
+#!/bin/bash 
 
-  #This script searches for matching files and two directories and will match them even if they do not have duplicated hash values. It works well. 
-
-read -r -p "Enter source directory. Leave blank and press enter for the current directory: " sourced
+echo > "$HOME/tmp/filematches-hack" #clear log file for fresh output
+echo "Script requires full directory paths to process. Ex: /home/username/Desktop"
+read -r -p "Enter path of source directory. Press enter for the current directory: " sourced
 #val="$(echo "$sourced")" 
 if [[ -z "$sourced" ]] || [[ "$sourced" == "." ]]; then 
     sourceval="."
 elif [[ -d "$sourced" ]]; then 
     sourceval="$sourced"
+elif pushd "$sourced" >/dev/null 2>&1; then
+    sourceval="$(pwd)"
+    popd || return  
 else 
     echo No directory matches your input 
-    echo Invalid entry- exiting script 
+    echo Invalid entry - exiting script 
     exit 1 
 fi
-read -r -p "Enter the target directory to find matching files " target
+read -r -p "Enter the target path to find matching files " target
 
-if [[ -d "$sourced" ]]; then 
+if [[ -d "$target" ]]; then 
     targetval="$target"
 else
     echo No directory matches your input 
     echo Invalid entry- exiting script 
     exit 1 
 fi
-popd || return  
 TEMPDIR="$(mktemp /tmp/tmpfile-XXXX)"  
-echo name of tempdir is "$TEMPDIR" 
+#TEMPSED="$(mktemp /tmp/tmpfile-XXXX)"
+#echo name of file sorting tempdir: "$TEMPSED"
 
 trap 'rm -- "$TEMPDIR"' EXIT 
 
-find "$sourceval"  -maxdepth 1  -type f | awk '{ print "" $2 "*" $3 ""  }' | tee -a "$TEMPDIR"
+find "$sourceval"  -type f  | awk -F/ '{print $NF}' | tee -a "$TEMPDIR" > /dev/null 
 
-read -r -p "Go over the file list if needed. You can locate it at: $TEMPDIR. Continue - yes or no: " ready
+#sed -i 's/^\*$/d'  "$TEMPDIR" "$TEMPSED"
+
+cat "$TEMPDIR"
+
+read -r -p "Go over list of located files if needed. Try vim $TEMPDIR in another window. Continue - yes or no: " ready
 if [[ "$ready" == "yes" ]]; then 
     echo "good - let's try to locate files "
-    echo "matching $sourcd with $target"
-
-    while IFS= read -r item 
-    do  
-        search=$(find "$targetval" -iwholename "*$item*") 
-        if [[ -n "$search" ]]; then 
-            echo found on "$targetval": "$search" 
-        else 
-            echo no item found matching string: "$item" 
-        fi
-        break
-    done < "$TEMPDIR"
-else 
-    echo OK - exiting script 
-    exit 0 
+    if [[ "$sourceval" == "." ]]; then  
+        echo "searching for files on $PWD that are also on $target"
+    else
+        echo "searching for files on $sourceval that are also on $target"
+    fi
+    cat "$TEMPDIR" |  while IFS= read -r item 
+do  
+    search=$(find "$targetval" -iname "*$item*" >> "$HOME/tmp/filematches-hack") #>> "$HOME/tmp/filematches-hack"
+    if [[ -n "$search" ]]; then 
+        echo no item found matching string: "$item" 
+    fi
+done  
+fi
+logout=$(cat "$HOME/tmp/filematches-hack" | wc -l) 
+sleep 1s && wait 
+if [[ $logout -gt 0 ]]; then
+    echo =========================================
+    cat "$HOME/tmp/filematches-hack" 
+    echo =========================================
+    echo all of the files above were found in both directories 
+    echo "you can find a log of that here: $HOME/tmp/filematches-hack" 
 fi
