@@ -1,0 +1,51 @@
+#!/bin/bash
+
+  #This script searches for matching files and two directories and will match them even if they do not have duplicated hash values. It works well. 
+
+read -r -p "Enter source directory. Leave blank and press enter for the current directory: " sourced
+#val="$(echo "$sourced")" 
+if [[ -z "$sourced" ]] || [[ "$sourced" == "." ]]; then 
+    sourceval="."
+elif [[ -d "$sourced" ]]; then 
+    sourceval="$sourced"
+else 
+    echo No directory matches your input 
+    echo Invalid entry- exiting script 
+    exit 1 
+fi
+read -r -p "Enter the target directory to find matching files " target
+
+if [[ -d "$sourced" ]]; then 
+    targetval="$target"
+else
+    echo No directory matches your input 
+    echo Invalid entry- exiting script 
+    exit 1 
+fi
+popd || return  
+TEMPDIR="$(mktemp /tmp/tmpfile-XXXX)"  
+echo name of tempdir is "$TEMPDIR" 
+
+trap 'rm -- "$TEMPDIR"' EXIT 
+
+find "$sourceval"  -maxdepth 1  -type f | awk '{ print "" $2 "*" $3 ""  }' | tee -a "$TEMPDIR"
+
+read -r -p "Go over the file list if needed. You can locate it at: $TEMPDIR. Continue - yes or no: " ready
+if [[ "$ready" == "yes" ]]; then 
+    echo "good - let's try to locate files "
+    echo "matching $sourcd with $target"
+
+    while IFS= read -r item 
+    do  
+        search=$(find "$targetval" -iwholename "*$item*") 
+        if [[ -n "$search" ]]; then 
+            echo found on "$targetval": "$search" 
+        else 
+            echo no item found matching string: "$item" 
+        fi
+        break
+    done < "$TEMPDIR"
+else 
+    echo OK - exiting script 
+    exit 0 
+fi
