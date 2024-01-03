@@ -1,0 +1,45 @@
+#!/bin/bash
+
+# Copyright 2023 Richard Kaler 
+#
+# This script is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as published
+# by the Free Software Foundation; either version 3 of the License, or (at
+# your option) any later version.
+#
+# This script is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+# General Public License for more details.
+
+if [[ "$1" == "-h" ]]; then 
+    echo "=========>filegrepper<=========="
+    echo  Search directories for files matching strings 
+    echo "Ex: Directory: \"/home/user/Desktop\" String: \"baseball\"" 
+    echo "Searches Desktop for files matching the string \"baseball\""
+    echo  "==========>Help Menu<==========="
+    exit 0
+fi
+if read -r -p "Enter the full path of the directory containing files you want to search
+Ex: /usr/local/bin/: " diritem; then 
+    read -r -p "OK - now enter a string for the term you want to identify in those files: " term 
+fi
+if ! [[ -d $diritem ]]; then 
+    echo Uh oh - you have entered an invalid directory 
+    echo Try again and enter a valid directory to search. Exiting script 
+    exit 1 
+fi
+
+
+echo The following filenames match your query 
+find "$diritem" -maxdepth 1 -type f | while IFS= read -r filename 
+do
+    val=$(grep -i -n --color=always "$term" "$filename") 
+    if [[ -n "$val" ]]; then  
+        echo "Instances of \"$term\" in $filename": 
+        echo "$val"
+        echo =========================================
+    fi
+done
+echo Finished searching: "$diritem"
+echo "The filenames above match your search for \"$term\" "
