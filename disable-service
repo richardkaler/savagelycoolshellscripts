@@ -1,0 +1,48 @@
+#!/bin/bash
+
+#Disables Services using systemctl 
+
+# Copyright 2023 Richard Kaler 
+#
+# This script is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as published
+# by the Free Software Foundation; either version 3 of the License, or (at
+# your option) any later version.
+#
+# This script is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+# General Public License for more details.
+
+
+if [[ "$1" == "-h" ]] || [[ "$#" -lt 1 ]]; then
+  echo "==============>HELP MENU<==============" 
+  echo "disable-service: quickly disable a systemd service"
+  echo "Requires at least one argument" 
+  echo "Ex: disable-service [ cockpit.socket ]" 
+  echo "The cockpit.socket service will be disabled"
+  echo "=======================================" 
+  exit 0 
+fi
+service="$1"
+
+isactive="$(systemctl show -p ActiveState "$1" | sed 's/ActiveState=//g' | grep -v "inactive")"
+#valactive="$(echo "$isactive")"
+
+if [[ -n "$isactive" ]]; then 
+    echo -e "Service is active: attempting to disable now"
+
+else 
+    echo "The service you are querying is already inactive - nothing to do"
+    exit 0 
+fi
+
+if sudo systemctl disable --now "$service"; then 
+  sudo  timeout 3s systemctl status "$service"
+  echo ======================================== 
+  echo Changed status above 
+  exit 0
+else 
+    echo "Failed to disable service - try something else"
+    exit 1 
+fi
