@@ -1,0 +1,54 @@
+#!/bin/bash 
+#This is a simple script I wrote on the fly to create swap space. 
+#For now it will only create 10G of swap but you can adjust it as needed. I tested it a bit and it appears to be working well. 
+
+while : 
+do
+read -r -p "Enter a location to create your swap file. 
+something like \"/home/user/.swapfile\" Make sure to enter the full path: " loc
+    swapfile="$loc"
+    if [[ -n "$loc" ]]; then 
+        sudo fallocate -l 1G "$swapfile" &&       
+            if [[ -f "$swapfile" ]]; then       
+                echo "File created to convert into swap"
+            fi
+        else 
+            echo "Failed to create file"
+            exit 1 
+    fi
+    if sudo dd if=/dev/zero of=/"$swapfile" bs=10240 count=1048576; then 
+        echo "Finished writing to swap file"
+    else 
+        echo "Failed to write to swap"
+    fi
+
+    echo "Now setting permissions for swap file" 
+        if sudo chmod 600 "$swapfile" && sleep 1s && wait; then 
+            echo "Successfully set permissions. Now activating swap"
+            while : 
+            do
+                finishswap() {
+                    sudo mkswap "$swapfile" && 
+                        sudo swapon "$swapfile" && 
+                      sleep 1s && wait 
+                    }
+
+
+                if finishswap; then
+                echo "Swap file is now active" 
+                echo "Success!" 
+                echo "Review your current swap allocation below"
+                timeout 3s swapon --show 
+            else 
+                echo "failed to activate swap but file does exit - activate manually" 
+                echo "try sudo swapon $swapfile"
+                exit 1
+            fi
+            break
+        done
+        else 
+            echo "Failed to set permissions and activate swap"
+            exit 1 
+        fi
+    break
+done
