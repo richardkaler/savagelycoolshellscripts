@@ -1,0 +1,23 @@
+#!/bin/bash
+
+#NOTE: There is more than one way to run this code - but the easiest...
+#way is to simply put it in your user profile: ~/.bashrc in my case 
+
+#About $logloc below. This references another script that... 
+#creates a log file based on the name of the script using the "basename" command   
+
+bashstart() {
+target="/home/username/bin/"
+#optionally: mkdir -p "$target" #This is not necessary for this to work but you should have a directory that's not owned by root to run this
+#NOTE: some of this is subject to preference. Obviously. 
+if [[ "$#" -eq 1 ]]; then #checks number of arguments - as there needs to be an argument to the function for it to work
+    {
+    if ! [[ -f "$target" ]]; then  #checks if the target exists - and this prevents redundancies or un-needed execution
+        touch "$target" #touch the file representing the script 
+    fi
+    echo "inserting shebang for script" #notify user that the shebang line is being echoed 
+    echo -e '#!/bin/bash\n\n' | tee "$1" #pipe the bash shebang (the interpreter identifier) to the script being created 
+    vim "$1" #finally the script is opened for edits using vim. You can change this to nano or gedit or whatever you prefer 
+} | tee -a "$logloc" #pipe script to log file - and in this case, my log file is defined elsewhere - this can be removed along with the curly braces outside of it
+fi
+}
